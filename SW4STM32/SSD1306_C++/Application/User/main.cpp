@@ -57,7 +57,7 @@ static void MX_GPIO_Init(void);
 static void MX_DMA_Init(void);
 static void MX_SPI2_Init(void);
 void HAL_SPI_TxCpltCallback(SPI_HandleTypeDef *hspi){
-	oled.HAL_SPI_TxCpltCallback(hspi);
+	oled.SPI_Interrupt(hspi);
 };
 /* USER CODE BEGIN PFP */
 

@@ -35,7 +35,7 @@ void SSD1306::ssd1306_Reset(void) {
 void SSD1306::ssd1306_WriteCommand() {
     HAL_GPIO_WritePin(SSD1306_CS_Port, SSD1306_CS_Pin, GPIO_PIN_RESET); // select OLED
     HAL_GPIO_WritePin(SSD1306_DC_Port, SSD1306_DC_Pin, GPIO_PIN_RESET); // command
-	HAL_SPI_Transmit(&SSD1306_SPI_PORT, lineCommands, 3, HAL_MAX_DELAY);
+	HAL_SPI_Transmit_DMA(&SSD1306_SPI_PORT, lineCommands, 3);
 }
 // Send data
 void SSD1306::ssd1306_WriteData() {
@@ -48,21 +48,22 @@ void SSD1306::ssd1306_WriteData() {
 //#error "You should define SSD1306_USE_SPI or SSD1306_USE_I2C macro"
 //#endif
 
-void SSD1306::HAL_SPI_TxCpltCallback(SPI_HandleTypeDef *hspi){
+void SSD1306::SPI_Interrupt(SPI_HandleTypeDef *hspi){
 	if (status==0){
-		status=1;
         lineCommands[0]=0xB0 + counter;
         lineCommands[1]=0x00;
         lineCommands[2]=0x10;
+        status=1;
 		ssd1306_WriteCommand();
 	}
-	if (status==1){
+	else{
 		status=0;
+		counter+=1;
+		if (counter==8)
+			counter=0;
 		ssd1306_WriteData();
 	}
-	counter+=1;
-	if (counter==8)
-		counter=0;
+
 }
 void SSD1306::ssd1306_Init(void) {
 	// Reset OLED
@@ -144,7 +145,7 @@ void SSD1306::ssd1306_Init(void) {
     HAL_SPI_Transmit_DMA(&SSD1306_SPI_PORT, initCommands, 28); // <---------
 
     // Clear screen
-    ssd1306_Fill(Black);
+    ssd1306_Fill(White);
 
     // Flush buffer to screen
 
@@ -258,7 +259,7 @@ void SSD1306::ssd1306_SetCursor(uint8_t x, uint8_t y) {
 
 SSD1306::SSD1306() {
 	// TODO Auto-generated constructor stub
-	counter=0;
+	counter=7;
 }
 
 SSD1306::~SSD1306() {

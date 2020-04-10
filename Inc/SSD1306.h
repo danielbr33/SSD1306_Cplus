@@ -114,7 +114,7 @@ public:
 	char ssd1306_WriteString(char* str, FontDef Font, SSD1306_COLOR color);
 	void ssd1306_SetCursor(uint8_t x, uint8_t y);
 	void process(void);
-	void HAL_SPI_TxCpltCallback(SPI_HandleTypeDef *hspi);
+	void SPI_Interrupt(SPI_HandleTypeDef *hspi);
 
 	// Low-level procedures
 	void ssd1306_Reset(void);
