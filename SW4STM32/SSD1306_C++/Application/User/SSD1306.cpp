@@ -173,12 +173,6 @@ void SSD1306::ssd1306_Init(void) {
     status=0;
     ssd1306_Fill(Black);
     SPI_Interrupt();
-    // ssd1306_Fill(Black);
-    //loop();
-    //ssd1306_Fill(White);
-    //loop();
-    //ssd1306_Fill(Black);
-    //loop();
 //-------------------------------------------------------------------------------------
     // Flush buffer to screen
 

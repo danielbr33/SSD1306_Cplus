@@ -102,13 +102,13 @@ int main(void)
   /* USER CODE BEGIN 2 */
   oled.ssd1306_Init();
   //oled.ssd1306_Fill(White);
-  oled.ssd1306_WriteString("ThanksThanksThanksThanks",Font_7x10,White);
+  oled.ssd1306_WriteString("/////////////",Font_7x10,White);
   oled.ssd1306_SetCursor(0,15);
-  oled.ssd1306_WriteString("ThanksThanksThanksThanks",Font_7x10,Black);
+  oled.ssd1306_WriteString("//////////////",Font_7x10,Black);
   oled.ssd1306_SetCursor(0,30);
-  oled.ssd1306_WriteString("ThanksThanksThanksThanks",Font_7x10,White);
+  oled.ssd1306_WriteString("/////////////",Font_7x10,White);
   oled.ssd1306_SetCursor(0,45);
-  oled.ssd1306_WriteString("ThanksThanksThanksThanks",Font_7x10,Black);
+  oled.ssd1306_WriteString("///////////",Font_7x10,Black);
   HAL_Delay(1000);
   /* USER CODE END 2 */
 
