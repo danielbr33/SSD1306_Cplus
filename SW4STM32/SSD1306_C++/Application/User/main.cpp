@@ -57,7 +57,7 @@ static void MX_GPIO_Init(void);
 static void MX_DMA_Init(void);
 static void MX_SPI2_Init(void);
 void HAL_SPI_TxCpltCallback(SPI_HandleTypeDef *hspi){
-	oled.SPI_Interrupt(hspi);
+	oled.SPI_Interrupt();
 };
 /* USER CODE BEGIN PFP */
 
@@ -101,14 +101,14 @@ int main(void)
   MX_SPI2_Init();
   /* USER CODE BEGIN 2 */
   oled.ssd1306_Init();
-  oled.ssd1306_Fill(White);
-  oled.ssd1306_WriteString("////",Font_7x10,Black);
+  //oled.ssd1306_Fill(White);
+  oled.ssd1306_WriteString("ThanksThanksThanksThanks",Font_7x10,White);
   oled.ssd1306_SetCursor(0,15);
-  oled.ssd1306_WriteString("////",Font_7x10,Black);
+  oled.ssd1306_WriteString("ThanksThanksThanksThanks",Font_7x10,Black);
   oled.ssd1306_SetCursor(0,30);
-  oled.ssd1306_WriteString("///",Font_7x10,Black);
+  oled.ssd1306_WriteString("ThanksThanksThanksThanks",Font_7x10,White);
   oled.ssd1306_SetCursor(0,45);
-  oled.ssd1306_WriteString("////",Font_7x10,Black);
+  oled.ssd1306_WriteString("ThanksThanksThanksThanks",Font_7x10,Black);
   HAL_Delay(1000);
   /* USER CODE END 2 */
 

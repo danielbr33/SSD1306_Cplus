@@ -48,8 +48,9 @@ void SSD1306::ssd1306_WriteData() {
 //#error "You should define SSD1306_USE_SPI or SSD1306_USE_I2C macro"
 //#endif
 
-void SSD1306::SPI_Interrupt(SPI_HandleTypeDef *hspi){
-	if (status==0){
+void SSD1306::SPI_Interrupt(){
+	if (status==2);
+	else if (status==0){
         lineCommands[0]=0xB0 + counter;
         lineCommands[1]=0x00;
         lineCommands[2]=0x10;
@@ -63,8 +64,26 @@ void SSD1306::SPI_Interrupt(SPI_HandleTypeDef *hspi){
 			counter=0;
 		ssd1306_WriteData();
 	}
-
 }
+
+void SSD1306::loop(){
+	for (int i=0; i<8 ; i++){
+        lineCommands[0]=0xB0 + counter;
+        lineCommands[1]=0x00;
+        lineCommands[2]=0x10;
+        status=1;
+		ssd1306_WriteCommand();
+	    HAL_Delay(100);
+		status=0;
+		counter+=1;
+		if (counter==8)
+			counter=0;
+		ssd1306_WriteData();
+	    HAL_Delay(100);
+	}
+	HAL_Delay(1000);
+}
+
 void SSD1306::ssd1306_Init(void) {
 	// Reset OLED
 	ssd1306_Reset();
@@ -141,19 +160,30 @@ void SSD1306::ssd1306_Init(void) {
     initCommands[25]=0x8D; //--set DC-DC enable
     initCommands[26]=0x14; //
     initCommands[27]=0xAF; //--turn on SSD1306 panel
-    status=0;
-    HAL_SPI_Transmit_DMA(&SSD1306_SPI_PORT, initCommands, 28); // <---------
+    status=2;
 
-    // Clear screen
-    ssd1306_Fill(White);
-
-    // Flush buffer to screen
-
-    // Set default values for screen object
     currentX = 0;
     currentY = 0;
 
     initialized = 1;
+//-------------------------------------------------------------------------------------
+    ssd1306_Fill(White);
+    HAL_SPI_Transmit_DMA(&SSD1306_SPI_PORT, initCommands, 28);
+    loop();
+    status=0;
+    ssd1306_Fill(Black);
+    SPI_Interrupt();
+    // ssd1306_Fill(Black);
+    //loop();
+    //ssd1306_Fill(White);
+    //loop();
+    //ssd1306_Fill(Black);
+    //loop();
+//-------------------------------------------------------------------------------------
+    // Flush buffer to screen
+
+    // Set default values for screen object
+
 }
 
 void SSD1306::process(){
