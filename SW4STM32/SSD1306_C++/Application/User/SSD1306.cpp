@@ -49,6 +49,7 @@ void SSD1306::ssd1306_WriteData() {
 //#endif
 
 void SSD1306::SPI_Interrupt(){
+	/*
 	if (status==2);
 	else if (status==0){
         lineCommands[0]=0xB0 + counter;
@@ -63,7 +64,7 @@ void SSD1306::SPI_Interrupt(){
 		if (counter==8)
 			counter=0;
 		ssd1306_WriteData();
-	}
+	}*/
 }
 
 void SSD1306::loop(){
@@ -169,9 +170,11 @@ void SSD1306::ssd1306_Init(void) {
 //-------------------------------------------------------------------------------------
     ssd1306_Fill(White);
     HAL_SPI_Transmit_DMA(&SSD1306_SPI_PORT, initCommands, 28);
+    ssd1306_Fill(White);
     loop();
     status=0;
     ssd1306_Fill(Black);
+    loop();
     SPI_Interrupt();
 //-------------------------------------------------------------------------------------
     // Flush buffer to screen
