@@ -49,7 +49,6 @@ void SSD1306::ssd1306_WriteData() {
 //#endif
 
 void SSD1306::SPI_Interrupt(){
-	/*
 	if (status==2);
 	else if (status==0){
         lineCommands[0]=0xB0 + counter;
@@ -64,26 +63,25 @@ void SSD1306::SPI_Interrupt(){
 		if (counter==8)
 			counter=0;
 		ssd1306_WriteData();
-	}*/
+	}
 }
 
-void SSD1306::loop(){
+/*void SSD1306::loop(){
 	for (int i=0; i<8 ; i++){
         lineCommands[0]=0xB0 + counter;
         lineCommands[1]=0x00;
         lineCommands[2]=0x10;
         status=1;
 		ssd1306_WriteCommand();
-	    HAL_Delay(100);
+	    HAL_Delay(10);
 		status=0;
 		counter+=1;
 		if (counter==8)
 			counter=0;
 		ssd1306_WriteData();
-	    HAL_Delay(100);
+	    HAL_Delay(10);
 	}
-	HAL_Delay(1000);
-}
+}*/
 
 void SSD1306::ssd1306_Init(void) {
 	// Reset OLED
@@ -167,16 +165,43 @@ void SSD1306::ssd1306_Init(void) {
     currentY = 0;
 
     initialized = 1;
-//-------------------------------------------------------------------------------------
+
+
+//------------------------------------------------------------------------------------
+    //Dzia³a
+
     ssd1306_Fill(White);
     HAL_SPI_Transmit_DMA(&SSD1306_SPI_PORT, initCommands, 28);
-    ssd1306_Fill(White);
-    loop();
     status=0;
-    ssd1306_Fill(Black);
-    loop();
     SPI_Interrupt();
+
+//------------------------------------------------------------------------------------
+    //Po takiej drobnej zmianie ju¿ nie
+    /*
+    HAL_SPI_Transmit_DMA(&SSD1306_SPI_PORT, initCommands, 28);
+    ssd1306_Fill(White);
+    status=0;
+    SPI_Interrupt();
+    */
+//--------------------------------------------------------------------------------------
+    //Nie dzia³a, a wlasnie tego poszukuje
+    /*
+    ssd1306_Fill(White);
+    status=0;
+    HAL_SPI_Transmit_DMA(&SSD1306_SPI_PORT, initCommands, 28);
+    */
 //-------------------------------------------------------------------------------------
+    //     Dzia³a choc chyba nie powinno bo najpierw HAL_SPI Transmit zaczyna przerwania ktore
+    //      ciagle chodza o pozniej SPI_Interrupt znowu wiec sa tak jakby dwa naraz
+    /*
+    ssd1306_Fill(White);
+    status=0;
+    HAL_SPI_Transmit_DMA(&SSD1306_SPI_PORT, initCommands, 28);
+    SPI_Interrupt();
+    */
+//-------------------------------------------------------------------------------------
+
+
     // Flush buffer to screen
 
     // Set default values for screen object
