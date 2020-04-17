@@ -7,21 +7,21 @@
 
 #include "SSD1306.h"
 
-//#if defined(SSD1306_USE_I2C)
-//void SSD1306::ssd1306_Reset(void) {
+#if defined(SSD1306_USE_I2C)
+void SSD1306::Reset(void) {
 	/* for I2C - do nothing */
-//}
+}
 // Send a byte to the command register
-//void SSD1306::ssd1306_WriteCommand(uint8_t byte) {
-//	HAL_I2C_Mem_Write(&SSD1306_I2C_PORT, SSD1306_I2C_ADDR, 0x00, 1, &byte, 1, HAL_MAX_DELAY);
-//}
+void SSD1306::WriteCommand(uint8_t byte) {
+	HAL_I2C_Mem_Write(&SSD1306_I2C_PORT, SSD1306_I2C_ADDR, 0x00, 1, &byte, 1, HAL_MAX_DELAY);
+}
 // Send data
-//void SSD1306::ssd1306_WriteData(uint8_t* buffer, size_t buff_size) {
-//	HAL_I2C_Mem_Write(&SSD1306_I2C_PORT, SSD1306_I2C_ADDR, 0x40, 1, buffer, buff_size, HAL_MAX_DELAY);
-//}
+void SSD1306::WriteData(uint8_t* buffer, size_t buff_size) {
+	HAL_I2C_Mem_Write(&SSD1306_I2C_PORT, SSD1306_I2C_ADDR, 0x40, 1, buffer, buff_size, HAL_MAX_DELAY);
+}
 
-//#elif defined(SSD1306_USE_SPI)
-void SSD1306::ssd1306_Reset(void) {
+#elif defined(SSD1306_USE_SPI)
+void SSD1306::Reset(void) {
 	// CS = High (not selected)
 	HAL_GPIO_WritePin(SSD1306_CS_Port, SSD1306_CS_Pin, GPIO_PIN_SET);
 
@@ -32,21 +32,21 @@ void SSD1306::ssd1306_Reset(void) {
 	HAL_Delay(10);
 }
 // Send a byte to the command register
-void SSD1306::ssd1306_WriteCommand() {
+void SSD1306::WriteCommand() {
     HAL_GPIO_WritePin(SSD1306_CS_Port, SSD1306_CS_Pin, GPIO_PIN_RESET); // select OLED
     HAL_GPIO_WritePin(SSD1306_DC_Port, SSD1306_DC_Pin, GPIO_PIN_RESET); // command
 	HAL_SPI_Transmit_DMA(&SSD1306_SPI_PORT, lineCommands, 3);
 }
 // Send data
-void SSD1306::ssd1306_WriteData() {
+void SSD1306::WriteData() {
     HAL_GPIO_WritePin(SSD1306_CS_Port, SSD1306_CS_Pin, GPIO_PIN_RESET); // select OLED
     HAL_GPIO_WritePin(SSD1306_DC_Port, SSD1306_DC_Pin, GPIO_PIN_SET); // data
 	HAL_SPI_Transmit_DMA(&SSD1306_SPI_PORT, &SSD1306_Buffer[SSD1306_WIDTH*counter], SSD1306_WIDTH);
 }
 
-//#else
-//#error "You should define SSD1306_USE_SPI or SSD1306_USE_I2C macro"
-//#endif
+#else
+#error "You should define SSD1306_USE_SPI or SSD1306_USE_I2C macro"
+#endif
 
 void SSD1306::SPI_Interrupt(){
 	if (status==2);
@@ -55,168 +55,111 @@ void SSD1306::SPI_Interrupt(){
         lineCommands[1]=0x00;
         lineCommands[2]=0x10;
         status=1;
-		ssd1306_WriteCommand();
+		WriteCommand();
 	}
 	else{
 		status=0;
 		counter+=1;
 		if (counter==8)
 			counter=0;
-		ssd1306_WriteData();
+		WriteData();
 	}
 }
 
-/*void SSD1306::loop(){
-	for (int i=0; i<8 ; i++){
-        lineCommands[0]=0xB0 + counter;
-        lineCommands[1]=0x00;
-        lineCommands[2]=0x10;
-        status=1;
-		ssd1306_WriteCommand();
-	    HAL_Delay(10);
-		status=0;
-		counter+=1;
-		if (counter==8)
-			counter=0;
-		ssd1306_WriteData();
-	    HAL_Delay(10);
-	}
-}*/
-
-void SSD1306::ssd1306_Init(void) {
+void SSD1306::Init(void) {
 	// Reset OLED
-	ssd1306_Reset();
+	Reset();
     // Wait for the screen to boot
     HAL_Delay(100);
 
     // Init OLED
-    initCommands[0]=0xAE; //display off
+    initCommands[0]=TURN_OFF;
 
-    initCommands[1]=0x20; //Set Memory Addressing Mode
-    initCommands[2]=0x00; // 00b,Horizontal Addressing Mode; 01b,Vertical Addressing Mode;
-                                // 10b,Page Addressing Mode (RESET); 11b,Invalid
+    initCommands[1]=SET_MEMORY_ADDR_MODE;
+    initCommands[2]=HORIZONTAL_ADDR_MODE;
 
-    initCommands[3]=0xB0; //Set Page Start Address for Page Addressing Mode,0-7
+    initCommands[3]=SET_PAGE_START_ADDR;
 
 	#ifdef SSD1306_MIRROR_VERT
-		initCommands[4]=0xC0; // Mirror vertically
+		initCommands[4]=MIRROR_VERTICAL;
 	#else
-		initCommands[4]=0xC8; //Set COM Output Scan Direction
+		initCommands[4]=COM_SCAN_DIRECTION;
 	#endif
 
-    initCommands[5]=0x00; //---set low column address
-    initCommands[6]=0x10; //---set high column address
+    initCommands[5]=LOW_COLUMN_ADDR;
+    initCommands[6]=HIGH_COLUMN_ADDR;
 
-    initCommands[7]=0x40; //--set start line address - CHECK
+    initCommands[7]=SET_START_LINE_ADDR;
 
-    initCommands[8]=0x81; //--set contrast control register - CHECK
-    initCommands[9]=0xFF;
+    initCommands[8]=SET_CONTRAST;
+    initCommands[9]=CONTRAST;
 
 	#ifdef SSD1306_MIRROR_HORIZ
-		initCommands[10]=0xA0; // Mirror horizontally
+		initCommands[10]=MIRROR_HORIZONTAL;
 	#else
-		initCommands[10]=0xA1; //--set segment re-map 0 to 127 - CHECK
+		initCommands[10]=SET_SEGMENT_REMAP;
 	#endif
 
 	#ifdef SSD1306_INVERSE_COLOR
-		initCommands[11]=0xA7; //--set inverse color
+		initCommands[11]=INVERSE_COLOR;
 	#else
-		initCommands[11]=0xA6; //--set normal color
+		initCommands[11]=NORMAL_COLOR;
 	#endif
 
-    initCommands[12]=0xA8; //--set multiplex ratio(1 to 64) - CHECK
+    initCommands[12]=SET_MULTIPLEX_RATIO;
 	#if (SSD1306_HEIGHT == 32)
-		initCommands[13]=0x1F; //
+		initCommands[13]=RATIO_32;
 	#elif (SSD1306_HEIGHT == 64)
-		initCommands[13]=0x3F; //
+		initCommands[13]=RATIO_64;
 	#else
 	#error "Only 32 or 64 lines of height are supported!"
 	#endif
 
-    initCommands[14]=0xA4; //0xa4,Output follows RAM content;0xa5,Output ignores RAM content
+    initCommands[14]=OUT_FOLLOW_RAM_CONTENT;
 
-    initCommands[15]=0xD3; //-set display offset - CHECK
-    initCommands[16]=0x00; //-not offset
+    initCommands[15]=DISPLAY_OFFSET;
+    initCommands[16]=DISPLAY_NOT_OFFSET;
 
-    initCommands[17]=0xD5; //--set display clock divide ratio/oscillator frequency
-    initCommands[18]=0xF0; //--set divide ratio
+    initCommands[17]=SET_CLOCK_DIVIDE_RATIO;
+    initCommands[18]=DIVIDE_RATIO;
 
-    initCommands[19]=0xD9; //--set pre-charge period
-    initCommands[20]=0x22; //
+    initCommands[19]=SET_PRE_CHARGE_PERIOD;
+    initCommands[20]=PRE_CHARGE_PERIOD;
 
-    initCommands[21]=0xDA; //--set com pins hardware configuration - CHECK
+    initCommands[21]=SET_COM_PIN;
 	#if (SSD1306_HEIGHT == 32)
-		initCommands[22]=0x02;
+		initCommands[22]=COM_PIN_32;
 	#elif (SSD1306_HEIGHT == 64)
-		initCommands[22]=0x12;
+		initCommands[22]=COM_PIN_64;
 	#else
 	#error "Only 32 or 64 lines of height are supported!"
 	#endif
 
-    initCommands[23]=0xDB; //--set vcomh
-    initCommands[24]=0x20; //0x20,0.77xVcc
+    initCommands[23]=SET_VCOMH;
+    initCommands[24]=VOLTAGE_77;
 
-    initCommands[25]=0x8D; //--set DC-DC enable
-    initCommands[26]=0x14; //
-    initCommands[27]=0xAF; //--turn on SSD1306 panel
+    initCommands[25]=SET_DC_ENABLE;
+    initCommands[26]=DC_ENABLE;
+    initCommands[27]=TURN_ON;
+
     status=2;
-
     currentX = 0;
     currentY = 0;
-
     initialized = 1;
 
-
-//------------------------------------------------------------------------------------
-    //Dzia³a
-
-    ssd1306_Fill(White);
+    Fill(White);
     HAL_SPI_Transmit_DMA(&SSD1306_SPI_PORT, initCommands, 28);
     status=0;
     SPI_Interrupt();
-
-//------------------------------------------------------------------------------------
-    //Po takiej drobnej zmianie ju¿ nie
-    /*
-    HAL_SPI_Transmit_DMA(&SSD1306_SPI_PORT, initCommands, 28);
-    ssd1306_Fill(White);
-    status=0;
-    SPI_Interrupt();
-    */
-//--------------------------------------------------------------------------------------
-    //Nie dzia³a, a wlasnie tego poszukuje
-    /*
-    ssd1306_Fill(White);
-    status=0;
-    HAL_SPI_Transmit_DMA(&SSD1306_SPI_PORT, initCommands, 28);
-    */
-//-------------------------------------------------------------------------------------
-    //     Dzia³a choc chyba nie powinno bo najpierw HAL_SPI Transmit zaczyna przerwania ktore
-    //      ciagle chodza o pozniej SPI_Interrupt znowu wiec sa tak jakby dwa naraz
-    /*
-    ssd1306_Fill(White);
-    status=0;
-    HAL_SPI_Transmit_DMA(&SSD1306_SPI_PORT, initCommands, 28);
-    SPI_Interrupt();
-    */
-//-------------------------------------------------------------------------------------
-
-
-    // Flush buffer to screen
-
-    // Set default values for screen object
-
 }
 
 void SSD1306::process(){
 	//components to display
-
-
 	HAL_Delay(5);
 }
 
 // Fill the whole screen with the given color
-void SSD1306::ssd1306_Fill(SSD1306_COLOR color) {
+void SSD1306::Fill(SSD1306_COLOR color) {
     /* Set memory */
     uint32_t i;
 
@@ -229,7 +172,7 @@ void SSD1306::ssd1306_Fill(SSD1306_COLOR color) {
 //    X => X Coordinate
 //    Y => Y Coordinate
 //    color => Pixel color
-void SSD1306::ssd1306_DrawPixel(uint8_t x, uint8_t y, SSD1306_COLOR color) {
+void SSD1306::DrawPixel(uint8_t x, uint8_t y, SSD1306_COLOR color) {
     if(x >= SSD1306_WIDTH || y >= SSD1306_HEIGHT) {
         // Don't write outside the buffer
         return;
@@ -252,7 +195,7 @@ void SSD1306::ssd1306_DrawPixel(uint8_t x, uint8_t y, SSD1306_COLOR color) {
 // ch       => char om weg te schrijven
 // Font     => Font waarmee we gaan schrijven
 // color    => Black or White
-char SSD1306::ssd1306_WriteChar(char ch, FontDef Font, SSD1306_COLOR color) {
+char SSD1306::WriteChar(char ch, FontDef Font, SSD1306_COLOR color) {
     uint32_t i, b, j;
 
     // Check if character is valid
@@ -272,9 +215,9 @@ char SSD1306::ssd1306_WriteChar(char ch, FontDef Font, SSD1306_COLOR color) {
         b = Font.data[(ch - 32) * Font.FontHeight + i];
         for(j = 0; j < Font.FontWidth; j++) {
             if((b << j) & 0x8000)  {
-                ssd1306_DrawPixel(currentX + j, (currentY + i), (SSD1306_COLOR) color);
+                DrawPixel(currentX + j, (currentY + i), (SSD1306_COLOR) color);
             } else {
-                ssd1306_DrawPixel(currentX + j, (currentY + i), (SSD1306_COLOR)!color);
+                DrawPixel(currentX + j, (currentY + i), (SSD1306_COLOR)!color);
             }
         }
     }
@@ -287,10 +230,10 @@ char SSD1306::ssd1306_WriteChar(char ch, FontDef Font, SSD1306_COLOR color) {
 }
 
 // Write full string to screenbuffer
-char SSD1306::ssd1306_WriteString(char* str, FontDef Font, SSD1306_COLOR color) {
+char SSD1306::WriteString(char* str, FontDef Font, SSD1306_COLOR color) {
     // Write until null-byte
     while (*str) {
-        if (ssd1306_WriteChar(*str, Font, color) != *str) {
+        if (WriteChar(*str, Font, color) != *str) {
             // Char could not be written
             return *str;
         }
@@ -304,7 +247,7 @@ char SSD1306::ssd1306_WriteString(char* str, FontDef Font, SSD1306_COLOR color) 
 }
 
 // Position the cursor
-void SSD1306::ssd1306_SetCursor(uint8_t x, uint8_t y) {
+void SSD1306::SetCursor(uint8_t x, uint8_t y) {
     currentX = x;
     currentY = y;
 }

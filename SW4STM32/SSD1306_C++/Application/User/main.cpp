@@ -55,7 +55,7 @@ SSD1306 oled;
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_DMA_Init(void);
-static void MX_SPI2_Init(void);
+void MX_SPI2_Init(void);
 void HAL_SPI_TxCpltCallback(SPI_HandleTypeDef *hspi){
 	oled.SPI_Interrupt();
 };
@@ -100,15 +100,15 @@ int main(void)
   MX_DMA_Init();
   MX_SPI2_Init();
   /* USER CODE BEGIN 2 */
-  oled.ssd1306_Init();
+  oled.Init();
   //oled.ssd1306_Fill(White);
-  oled.ssd1306_WriteString("/////////////",Font_7x10,White);
-  oled.ssd1306_SetCursor(0,15);
-  oled.ssd1306_WriteString("//////////////",Font_7x10,Black);
-  oled.ssd1306_SetCursor(0,30);
-  oled.ssd1306_WriteString("/////////////",Font_7x10,White);
-  oled.ssd1306_SetCursor(0,45);
-  oled.ssd1306_WriteString("///////////",Font_7x10,Black);
+  oled.WriteString("/////////////",Font_7x10,White);
+  oled.SetCursor(0,15);
+  oled.WriteString("//////////////",Font_7x10,Black);
+  oled.SetCursor(0,30);
+  oled.WriteString("/////////////",Font_7x10,White);
+  oled.SetCursor(0,45);
+  oled.WriteString("///////////",Font_7x10,Black);
   HAL_Delay(1000);
   /* USER CODE END 2 */
 
@@ -165,7 +165,7 @@ void SystemClock_Config(void)
   * @param None
   * @retval None
   */
-static void MX_SPI2_Init(void)
+void MX_SPI2_Init(void)
 {
 
   /* USER CODE BEGIN SPI2_Init 0 */
