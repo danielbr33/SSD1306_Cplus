@@ -25,25 +25,25 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   ALLOC
  10 .ARM.attributes 00000030  00000000  00000000  000402d0  2**0
                   CONTENTS, READONLY
- 11 .debug_line   000080ed  00000000  00000000  00040300  2**0
+ 11 .debug_line   000080eb  00000000  00000000  00040300  2**0
                   CONTENTS, READONLY, DEBUGGING
- 12 .debug_info   000149e5  00000000  00000000  000483ed  2**0
+ 12 .debug_info   000149e0  00000000  00000000  000483eb  2**0
                   CONTENTS, READONLY, DEBUGGING
- 13 .debug_abbrev 000029af  00000000  00000000  0005cdd2  2**0
+ 13 .debug_abbrev 000029c8  00000000  00000000  0005cdcb  2**0
                   CONTENTS, READONLY, DEBUGGING
- 14 .debug_aranges 00000788  00000000  00000000  0005f788  2**3
+ 14 .debug_aranges 00000788  00000000  00000000  0005f798  2**3
                   CONTENTS, READONLY, DEBUGGING
- 15 .debug_ranges 00000730  00000000  00000000  0005ff10  2**3
+ 15 .debug_ranges 00000730  00000000  00000000  0005ff20  2**3
                   CONTENTS, READONLY, DEBUGGING
- 16 .debug_loc    00003ed9  00000000  00000000  00060640  2**0
+ 16 .debug_loc    00003ed9  00000000  00000000  00060650  2**0
                   CONTENTS, READONLY, DEBUGGING
- 17 .debug_macro  00020dc7  00000000  00000000  00064519  2**0
+ 17 .debug_macro  00020dc7  00000000  00000000  00064529  2**0
                   CONTENTS, READONLY, DEBUGGING
- 18 .debug_str    000a4927  00000000  00000000  000852e0  2**0
+ 18 .debug_str    000a4927  00000000  00000000  000852f0  2**0
                   CONTENTS, READONLY, DEBUGGING
- 19 .comment      0000007c  00000000  00000000  00129c07  2**0
+ 19 .comment      0000007c  00000000  00000000  00129c17  2**0
                   CONTENTS, READONLY
- 20 .debug_frame  00015628  00000000  00000000  00129c84  2**2
+ 20 .debug_frame  00015628  00000000  00000000  00129c94  2**2
                   CONTENTS, READONLY, DEBUGGING
 
 Disassembly of section .text:
@@ -1771,7 +1771,7 @@ void SSD1306::ssd1306_Fill(SSD1306_COLOR color) {
 
 08001218 <_ZN7SSD130612ssd1306_InitEv>:
 void SSD1306::ssd1306_Init(void) {
- 8001218:	b570      	push	{r4, r5, r6, lr}
+ 8001218:	b538      	push	{r3, r4, r5, lr}
  800121a:	4604      	mov	r4, r0
 	ssd1306_Reset();
  800121c:	f7ff ff6a 	bl	80010f4 <_ZN7SSD130613ssd1306_ResetEv>
@@ -1867,23 +1867,23 @@ void SSD1306::ssd1306_Init(void) {
     currentY = 0;
  80012a4:	80e5      	strh	r5, [r4, #6]
     initialized = 1;
- 80012a6:	2601      	movs	r6, #1
- 80012a8:	7266      	strb	r6, [r4, #9]
-    HAL_SPI_Transmit_DMA(&SSD1306_SPI_PORT, initCommands, 28);
- 80012aa:	221c      	movs	r2, #28
- 80012ac:	f104 010b 	add.w	r1, r4, #11
- 80012b0:	4805      	ldr	r0, [pc, #20]	; (80012c8 <_ZN7SSD130612ssd1306_InitEv+0xb0>)
- 80012b2:	f001 fad1 	bl	8002858 <HAL_SPI_Transmit_DMA>
+ 80012a6:	2101      	movs	r1, #1
+ 80012a8:	7261      	strb	r1, [r4, #9]
     ssd1306_Fill(White);
- 80012b6:	4631      	mov	r1, r6
- 80012b8:	4620      	mov	r0, r4
- 80012ba:	f7ff ff97 	bl	80011ec <_ZN7SSD130612ssd1306_FillE13SSD1306_COLOR>
+ 80012aa:	4620      	mov	r0, r4
+ 80012ac:	f7ff ff9e 	bl	80011ec <_ZN7SSD130612ssd1306_FillE13SSD1306_COLOR>
+    HAL_SPI_Transmit_DMA(&SSD1306_SPI_PORT, initCommands, 28);
+ 80012b0:	221c      	movs	r2, #28
+ 80012b2:	f104 010b 	add.w	r1, r4, #11
+ 80012b6:	4804      	ldr	r0, [pc, #16]	; (80012c8 <_ZN7SSD130612ssd1306_InitEv+0xb0>)
+ 80012b8:	f001 face 	bl	8002858 <HAL_SPI_Transmit_DMA>
     status=0;
- 80012be:	72a5      	strb	r5, [r4, #10]
+ 80012bc:	72a5      	strb	r5, [r4, #10]
     SPI_Interrupt();
- 80012c0:	4620      	mov	r0, r4
- 80012c2:	f7ff ff6d 	bl	80011a0 <_ZN7SSD130613SPI_InterruptEv>
- 80012c6:	bd70      	pop	{r4, r5, r6, pc}
+ 80012be:	4620      	mov	r0, r4
+ 80012c0:	f7ff ff6e 	bl	80011a0 <_ZN7SSD130613SPI_InterruptEv>
+ 80012c4:	bd38      	pop	{r3, r4, r5, pc}
+ 80012c6:	bf00      	nop
  80012c8:	200002fc 	.word	0x200002fc
 
 080012cc <_ZN7SSD130617ssd1306_DrawPixelEhh13SSD1306_COLOR>:
