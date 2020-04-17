@@ -14,7 +14,6 @@
 #include <cstddef>
 #include "_ansi.h"
 #include "SSD1306_font.h"
-#include "spi.h"
 
 
 #define STM32F3

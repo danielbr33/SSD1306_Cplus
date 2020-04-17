@@ -56,11 +56,11 @@ void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_DMA_Init(void);
 void MX_SPI2_Init(void);
+/* USER CODE BEGIN PFP */
+
 void HAL_SPI_TxCpltCallback(SPI_HandleTypeDef *hspi){
 	oled.SPI_Interrupt();
 };
-/* USER CODE BEGIN PFP */
-
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
