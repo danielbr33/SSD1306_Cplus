@@ -108,7 +108,7 @@ int main(void)
   oled.SetCursor(0,30);
   oled.WriteString("/////////////",Font_7x10,White);
   oled.SetCursor(0,45);
-  oled.WriteString("///////////",Font_7x10,Black);
+ // oled.WriteString("///////////",Font_7x10,Black);
   HAL_Delay(1000);
   /* USER CODE END 2 */
 
