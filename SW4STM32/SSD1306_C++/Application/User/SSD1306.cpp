@@ -7,46 +7,50 @@
 
 #include "SSD1306.h"
 
-#if defined(SSD1306_USE_I2C)
-void SSD1306::Reset(void) {
-	/* for I2C - do nothing */
-}
-// Send a byte to the command register
-void SSD1306::WriteCommand(uint8_t byte) {
-	HAL_I2C_Mem_Write(&SSD1306_I2C_PORT, SSD1306_I2C_ADDR, 0x00, 1, &byte, 1, HAL_MAX_DELAY);
-}
-// Send data
-void SSD1306::WriteData(uint8_t* buffer, size_t buff_size) {
-	HAL_I2C_Mem_Write(&SSD1306_I2C_PORT, SSD1306_I2C_ADDR, 0x40, 1, buffer, buff_size, HAL_MAX_DELAY);
-}
-
-#elif defined(SSD1306_USE_SPI)
 void SSD1306::Reset(void) {
 	// CS = High (not selected)
-	HAL_GPIO_WritePin(SSD1306_CS_Port, SSD1306_CS_Pin, GPIO_PIN_SET);
-
-	// Reset the OLED
-	HAL_GPIO_WritePin(SSD1306_Reset_Port, SSD1306_Reset_Pin, GPIO_PIN_RESET);
-	HAL_Delay(10);
-	HAL_GPIO_WritePin(SSD1306_Reset_Port, SSD1306_Reset_Pin, GPIO_PIN_SET);
-	HAL_Delay(10);
+	if (i2c_or_spi=="spi"){
+		HAL_GPIO_WritePin(CS_PORT, CS_PIN, GPIO_PIN_SET);
+		HAL_GPIO_WritePin(RESET_PORT, RESET_PIN, GPIO_PIN_RESET);
+		HAL_Delay(10);
+		HAL_GPIO_WritePin(RESET_PORT, RESET_PIN, GPIO_PIN_SET);
+		HAL_Delay(10);
+	}
 }
 // Send a byte to the command register
 void SSD1306::WriteCommand() {
-    HAL_GPIO_WritePin(SSD1306_CS_Port, SSD1306_CS_Pin, GPIO_PIN_RESET); // select OLED
-    HAL_GPIO_WritePin(SSD1306_DC_Port, SSD1306_DC_Pin, GPIO_PIN_RESET); // command
-	HAL_SPI_Transmit_DMA(&SSD1306_SPI_PORT, lineCommands, 3);
+	if (i2c_or_spi=="spi"){
+		HAL_GPIO_WritePin(CS_PORT, CS_PIN, GPIO_PIN_RESET); // select OLED
+		HAL_GPIO_WritePin(DC_PORT, DC_PIN, GPIO_PIN_RESET); // command
+		if (dma_switch==true)
+			HAL_SPI_Transmit_DMA(&SSD1306_SPI_PORT, lineCommands, 3);
+		else
+			HAL_SPI_Transmit(&SSD1306_SPI_PORT, lineCommands, 3, HAL_MAX_DELAY);
+	}
+	else{
+		if (dma_switch==true)
+			HAL_I2C_Mem_Write_DMA(&SSD1306_I2C_PORT, I2C_ADDR, 0x00, 1, lineCommands, 3);
+		else
+			HAL_I2C_Mem_Write(&SSD1306_I2C_PORT, I2C_ADDR, 0x00, 1, lineCommands, 3, HAL_MAX_DELAY);
+	}
 }
 // Send data
 void SSD1306::WriteData() {
-    HAL_GPIO_WritePin(SSD1306_CS_Port, SSD1306_CS_Pin, GPIO_PIN_RESET); // select OLED
-    HAL_GPIO_WritePin(SSD1306_DC_Port, SSD1306_DC_Pin, GPIO_PIN_SET); // data
-	HAL_SPI_Transmit_DMA(&SSD1306_SPI_PORT, &SSD1306_Buffer[SSD1306_WIDTH*counter], SSD1306_WIDTH);
+	if (i2c_or_spi=="spi"){
+		HAL_GPIO_WritePin(CS_PORT, CS_PIN, GPIO_PIN_RESET); // select OLED
+		HAL_GPIO_WritePin(DC_PORT, DC_PIN, GPIO_PIN_SET); // data
+		if (dma_switch==true)
+			HAL_SPI_Transmit_DMA(&SSD1306_SPI_PORT, &SSD1306_Buffer[width*counter], width);
+		else
+			HAL_SPI_Transmit(&SSD1306_SPI_PORT, &SSD1306_Buffer[width*counter], width, HAL_MAX_DELAY);
+	}
+	else {
+		if (dma_switch==true)
+			HAL_I2C_Mem_Write_DMA(&SSD1306_I2C_PORT, I2C_ADDR, 0x40, 1, &SSD1306_Buffer[width*counter], width);
+		else
+			HAL_I2C_Mem_Write(&SSD1306_I2C_PORT, I2C_ADDR, 0x40, 1, &SSD1306_Buffer[width*counter], width, HAL_MAX_DELAY);
+	}
 }
-
-#else
-#error "You should define SSD1306_USE_SPI or SSD1306_USE_I2C macro"
-#endif
 
 void SSD1306::SPI_Interrupt(){
 	if (status==2);
@@ -80,7 +84,7 @@ void SSD1306::Init(void) {
 
     initCommands[3]=SET_PAGE_START_ADDR;
 
-	#ifdef SSD1306_MIRROR_VERT
+	#ifdef MIRROR_VERTICAL
 		initCommands[4]=MIRROR_VERTICAL;
 	#else
 		initCommands[4]=COM_SCAN_DIRECTION;
@@ -94,7 +98,7 @@ void SSD1306::Init(void) {
     initCommands[8]=SET_CONTRAST;
     initCommands[9]=CONTRAST;
 
-	#ifdef SSD1306_MIRROR_HORIZ
+	#ifdef MIRROR_HORIZ
 		initCommands[10]=MIRROR_HORIZONTAL;
 	#else
 		initCommands[10]=SET_SEGMENT_REMAP;
@@ -107,13 +111,11 @@ void SSD1306::Init(void) {
 	#endif
 
     initCommands[12]=SET_MULTIPLEX_RATIO;
-	#if (SSD1306_HEIGHT == 32)
+	if (height == 32)
 		initCommands[13]=RATIO_32;
-	#elif (SSD1306_HEIGHT == 64)
+	else if (height == 64)
 		initCommands[13]=RATIO_64;
-	#else
-	#error "Only 32 or 64 lines of height are supported!"
-	#endif
+	else
 
     initCommands[14]=OUT_FOLLOW_RAM_CONTENT;
 
@@ -127,13 +129,11 @@ void SSD1306::Init(void) {
     initCommands[20]=PRE_CHARGE_PERIOD;
 
     initCommands[21]=SET_COM_PIN;
-	#if (SSD1306_HEIGHT == 32)
+	if (height == 32)
 		initCommands[22]=COM_PIN_32;
-	#elif (SSD1306_HEIGHT == 64)
+	else if (height == 64)
 		initCommands[22]=COM_PIN_64;
-	#else
-	#error "Only 32 or 64 lines of height are supported!"
-	#endif
+	else
 
     initCommands[23]=SET_VCOMH;
     initCommands[24]=VOLTAGE_77;
@@ -158,6 +158,9 @@ void SSD1306::process(){
 	HAL_Delay(5);
 }
 
+void SSD1306::AllocBuffer(){
+	this->SSD1306_Buffer=(uint8_t*)malloc(width * height /8);
+}
 // Fill the whole screen with the given color
 void SSD1306::Fill(SSD1306_COLOR color) {
     /* Set memory */
@@ -173,7 +176,7 @@ void SSD1306::Fill(SSD1306_COLOR color) {
 //    Y => Y Coordinate
 //    color => Pixel color
 void SSD1306::DrawPixel(uint8_t x, uint8_t y, SSD1306_COLOR color) {
-    if(x >= SSD1306_WIDTH || y >= SSD1306_HEIGHT) {
+    if(x >= width || y >= height) {
         // Don't write outside the buffer
         return;
     }
@@ -185,9 +188,9 @@ void SSD1306::DrawPixel(uint8_t x, uint8_t y, SSD1306_COLOR color) {
 
     // Draw in the right color
     if(color == White) {
-        SSD1306_Buffer[x + (y / 8) * SSD1306_WIDTH] |= 1 << (y % 8);
+        SSD1306_Buffer[x + (y / 8) * width] |= 1 << (y % 8);
     } else {
-        SSD1306_Buffer[x + (y / 8) * SSD1306_WIDTH] &= ~(1 << (y % 8));
+        SSD1306_Buffer[x + (y / 8) * width] &= ~(1 << (y % 8));
     }
 }
 
@@ -203,8 +206,8 @@ char SSD1306::WriteChar(char ch, FontDef Font, SSD1306_COLOR color) {
         return 0;
 
     // Check remaining space on current line
-    if (SSD1306_WIDTH < (currentX + Font.FontWidth) ||
-        SSD1306_HEIGHT < (currentY + Font.FontHeight))
+    if (width < (currentX + Font.FontWidth) ||
+        height < (currentY + Font.FontHeight))
     {
         // Not enough space on current line
         return 0;
@@ -252,9 +255,35 @@ void SSD1306::SetCursor(uint8_t x, uint8_t y) {
     currentY = y;
 }
 
-SSD1306::SSD1306() {
-	// TODO Auto-generated constructor stub
+SSD1306::SSD1306(I2C_HandleTypeDef i2c, int I2C_ADDR, GPIO_TypeDef CLK_PIN,
+		GPIO_TypeDef MOSI_PIN, bool dma_switch, int height, int width){
+	this->SSD1306_I2C_PORT=i2c;
+	this->I2C_ADDR=I2C_ADDR;
+	this->CLK_PIN=CLK_PIN;
+	this->MOSI_PIN=MOSI_PIN;
+	this->dma_switch=dma_switch;
+	this->height=height;
+	this->width=width;
+	i2c_or_spi="i2c";
 	counter=7;
+	AllocBuffer();
+}
+
+SSD1306::SSD1306(SPI_HandleTypeDef spi, GPIO_TypeDef CLK_PIN, GPIO_TypeDef MOSI_PIN,
+		GPIO_TypeDef RESET_PIN, GPIO_TypeDef CS_PIN, GPIO_TypeDef DC_PIN,
+		bool dma_switch, int height, int width) {
+	this->SSD1306_SPI_PORT = spi;
+	this->CLK_PIN=CLK_PIN;
+	this->MOSI_PIN=MOSI_PIN;
+	this->RESET_PIN=RESET_PIN;
+	this->CS_PIN=CS_PIN;
+	this->DC_PIN=DC_PIN;
+	this->dma_switch=dma_switch;
+	this->height=height;
+	this->width=width;
+	i2c_or_spi="spi";
+	counter=7;
+	AllocBuffer();
 }
 
 SSD1306::~SSD1306() {

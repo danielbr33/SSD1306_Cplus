@@ -15,6 +15,9 @@
 #include "_ansi.h"
 #include "SSD1306_font.h"
 
+#define MIRROR_VERTICAL_NO
+#define MIRROR_HORIZONTAL_NO
+#define INVERSE_COLOR_NO
 
 #define STM32F3
 #if defined(STM32F1)
@@ -70,76 +73,19 @@
 #define SET_DC_ENABLE	0x8D
 #define DC_ENABLE	0x14
 
-
-#define SSD1306_USE_SPI
-
-/* vvv I2C config vvv */
-#ifndef SSD1306_I2C_PORT
-#define SSD1306_I2C_PORT		hi2c1
-#endif
-
-
-#ifndef SSD1306_I2C_ADDR
-#define SSD1306_I2C_ADDR        (0x3C << 1)
-#endif
-/* ^^^ I2C config ^^^ */
-
-/* vvv SPI config vvv */
-#ifndef SSD1306_SPI_PORT
-#define SSD1306_SPI_PORT        hspi2
-#endif
-
-#ifndef SSD1306_CS_Port
-#define SSD1306_CS_Port         GPIOB
-#endif
-#ifndef SSD1306_CS_Pin
-#define SSD1306_CS_Pin          GPIO_PIN_12
-#endif
-
-#ifndef SSD1306_DC_Port
-#define SSD1306_DC_Port         GPIOB
-#endif
-#ifndef SSD1306_DC_Pin
-#define SSD1306_DC_Pin          GPIO_PIN_14
-#endif
-
-#ifndef SSD1306_Reset_Port
-#define SSD1306_Reset_Port      GPIOA
-#endif
-#ifndef SSD1306_Reset_Pin
-#define SSD1306_Reset_Pin       GPIO_PIN_8
-#endif
-/* ^^^ SPI config ^^^ */
-
-#if defined(SSD1306_USE_I2C)
-extern I2C_HandleTypeDef SSD1306_I2C_PORT;
-#elif defined(SSD1306_USE_SPI)
-extern SPI_HandleTypeDef SSD1306_SPI_PORT;
-#else
-#error "You should define SSD1306_USE_SPI or SSD1306_USE_I2C macro!"
-#endif
-
-// SSD1306 OLED height in pixels
-#ifndef SSD1306_HEIGHT
-#define SSD1306_HEIGHT          64
-#endif
-
-// SSD1306 width in pixels
-#ifndef SSD1306_WIDTH
-#define SSD1306_WIDTH           128
-#endif
-
 // Enumeration for screen colors
 typedef enum {
     Black = 0x00, // Black color, no pixel
     White = 0x01  // Pixel is set. Color depends on OLED
 } SSD1306_COLOR;
 
-// Struct to store transformations
-
 class SSD1306 {
 public:
-	SSD1306();
+	SSD1306(I2C_HandleTypeDef i2c, int I2C_ADDRESS, GPIO_TypeDef CLK_PIN,
+			GPIO_TypeDef MOSI_PIN, bool dma_switch, int height, int width);
+	SSD1306(SPI_HandleTypeDef spi, GPIO_TypeDef CLK_PIN, GPIO_TypeDef MOSI_PIN,
+			GPIO_TypeDef RESET_PIN, GPIO_TypeDef CS_PIN, GPIO_TypeDef DC_PIN,
+			bool dma_switch, int height, int width);
 	virtual ~SSD1306();
 	// Procedure definitions
 	void Init(void);
@@ -156,6 +102,18 @@ public:
 	void WriteCommand();
 	void WriteData();
 private:
+	extern I2C_HandleTypeDef SSD1306_I2C_PORT;
+	int I2C_ADDR;	//(0x3C << 1)
+	extern SPI_HandleTypeDef SSD1306_SPI_PORT;
+	extern GPIO_TypeDef MOSI_PIN;
+	extern GPIO_TypeDef CLK_PIN;
+	extern GPIO_TypeDef DC_PIN;
+	extern GPIO_TypeDef CS_PIN;
+	extern GPIO_TypeDef RESET_PIN;
+	bool dma_switch;
+	int height; 	//64
+	int width;		//128
+	string i2c_or_spi;
     uint16_t currentX;
     uint16_t currentY;
     uint8_t inverted;
@@ -163,8 +121,9 @@ private:
     uint8_t status;
     uint8_t initCommands[28];
     uint8_t lineCommands[3];
-    uint8_t SSD1306_Buffer[SSD1306_WIDTH * SSD1306_HEIGHT /8];
+    uint8_t *SSD1306_Buffer;
     uint8_t counter;
+    void AllocBuffer();
 };
 
 #endif /* APPLICATION_USER_SSD1306_H_ */
