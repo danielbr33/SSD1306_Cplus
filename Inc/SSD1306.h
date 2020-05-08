@@ -81,13 +81,14 @@ typedef enum {
 
 class SSD1306 {
 public:
-	SSD1306(I2C_HandleTypeDef i2c, int I2C_ADDRESS, GPIO_TypeDef CLK_PIN,
-			GPIO_TypeDef MOSI_PIN, bool dma_switch, int height, int width);
-	SSD1306(SPI_HandleTypeDef spi, GPIO_TypeDef CLK_PIN, GPIO_TypeDef MOSI_PIN,
-			GPIO_TypeDef RESET_PIN, GPIO_TypeDef CS_PIN, GPIO_TypeDef DC_PIN,
-			bool dma_switch, int height, int width);
+	SSD1306(I2C_HandleTypeDef* i2c, int I2C_ADDRESS, GPIO_TypeDef* CLK_PORT,
+			GPIO_TypeDef* MOSI_PORT, int height, int width);
+	SSD1306(SPI_HandleTypeDef* spi, GPIO_TypeDef* CLK_PORT, GPIO_TypeDef* MOSI_PORT,
+			GPIO_TypeDef* RESET_PORT, GPIO_TypeDef* CS_PORT, GPIO_TypeDef* DC_PORT,
+			int height, int width);
 	virtual ~SSD1306();
 	// Procedure definitions
+	void SwitchDMA(bool dma);
 	void Init(void);
 	void Fill(SSD1306_COLOR color);
 	void DrawPixel(uint8_t x, uint8_t y, SSD1306_COLOR color);
@@ -95,25 +96,26 @@ public:
 	char WriteString(char* str, FontDef Font, SSD1306_COLOR color);
 	void SetCursor(uint8_t x, uint8_t y);
 	void process(void);
-	void SPI_Interrupt();
-	void loop();
+	void SPI_Interrupt_DMA();
+	void SendWithoutDma();
 	// Low-level procedures
 	void Reset(void);
 	void WriteCommand();
 	void WriteData();
 private:
-	extern I2C_HandleTypeDef SSD1306_I2C_PORT;
+	I2C_HandleTypeDef* SSD1306_I2C_PORT;
 	int I2C_ADDR;	//(0x3C << 1)
-	extern SPI_HandleTypeDef SSD1306_SPI_PORT;
-	extern GPIO_TypeDef MOSI_PIN;
-	extern GPIO_TypeDef CLK_PIN;
-	extern GPIO_TypeDef DC_PIN;
-	extern GPIO_TypeDef CS_PIN;
-	extern GPIO_TypeDef RESET_PIN;
-	bool dma_switch;
+	SPI_HandleTypeDef* SSD1306_SPI_PORT;
+	GPIO_TypeDef* MOSI_PORT;
+	GPIO_TypeDef* CLK_PORT;
+	GPIO_TypeDef* DC_PORT;
+	GPIO_TypeDef* CS_PORT;
+	GPIO_TypeDef* RESET_PORT;
+	bool dma_status;
 	int height; 	//64
 	int width;		//128
 	string i2c_or_spi;
+
     uint16_t currentX;
     uint16_t currentY;
     uint8_t inverted;

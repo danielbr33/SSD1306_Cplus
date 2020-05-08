@@ -22,16 +22,16 @@ void SSD1306::WriteCommand() {
 	if (i2c_or_spi=="spi"){
 		HAL_GPIO_WritePin(CS_PORT, CS_PIN, GPIO_PIN_RESET); // select OLED
 		HAL_GPIO_WritePin(DC_PORT, DC_PIN, GPIO_PIN_RESET); // command
-		if (dma_switch==true)
-			HAL_SPI_Transmit_DMA(&SSD1306_SPI_PORT, lineCommands, 3);
+		if (dma_status==true)
+			HAL_SPI_Transmit_DMA(SSD1306_SPI_PORT, lineCommands, 3);
 		else
-			HAL_SPI_Transmit(&SSD1306_SPI_PORT, lineCommands, 3, HAL_MAX_DELAY);
+			HAL_SPI_Transmit(SSD1306_SPI_PORT, lineCommands, 3, HAL_MAX_DELAY);
 	}
 	else{
-		if (dma_switch==true)
-			HAL_I2C_Mem_Write_DMA(&SSD1306_I2C_PORT, I2C_ADDR, 0x00, 1, lineCommands, 3);
+		if (dma_status==true)
+			HAL_I2C_Mem_Write_DMA(SSD1306_I2C_PORT, I2C_ADDR, 0x00, 1, lineCommands, 3);
 		else
-			HAL_I2C_Mem_Write(&SSD1306_I2C_PORT, I2C_ADDR, 0x00, 1, lineCommands, 3, HAL_MAX_DELAY);
+			HAL_I2C_Mem_Write(SSD1306_I2C_PORT, I2C_ADDR, 0x00, 1, lineCommands, 3, HAL_MAX_DELAY);
 	}
 }
 // Send data
@@ -39,33 +39,46 @@ void SSD1306::WriteData() {
 	if (i2c_or_spi=="spi"){
 		HAL_GPIO_WritePin(CS_PORT, CS_PIN, GPIO_PIN_RESET); // select OLED
 		HAL_GPIO_WritePin(DC_PORT, DC_PIN, GPIO_PIN_SET); // data
-		if (dma_switch==true)
-			HAL_SPI_Transmit_DMA(&SSD1306_SPI_PORT, &SSD1306_Buffer[width*counter], width);
+		if (dma_status==true)
+			HAL_SPI_Transmit_DMA(SSD1306_SPI_PORT, &SSD1306_Buffer[width*counter], width);
 		else
-			HAL_SPI_Transmit(&SSD1306_SPI_PORT, &SSD1306_Buffer[width*counter], width, HAL_MAX_DELAY);
+			HAL_SPI_Transmit(SSD1306_SPI_PORT, &SSD1306_Buffer[width*counter], width, HAL_MAX_DELAY);
 	}
 	else {
-		if (dma_switch==true)
-			HAL_I2C_Mem_Write_DMA(&SSD1306_I2C_PORT, I2C_ADDR, 0x40, 1, &SSD1306_Buffer[width*counter], width);
+		if (dma_status==true)
+			HAL_I2C_Mem_Write_DMA(SSD1306_I2C_PORT, I2C_ADDR, 0x40, 1, &SSD1306_Buffer[width*counter], width);
 		else
-			HAL_I2C_Mem_Write(&SSD1306_I2C_PORT, I2C_ADDR, 0x40, 1, &SSD1306_Buffer[width*counter], width, HAL_MAX_DELAY);
+			HAL_I2C_Mem_Write(SSD1306_I2C_PORT, I2C_ADDR, 0x40, 1, &SSD1306_Buffer[width*counter], width, HAL_MAX_DELAY);
 	}
 }
 
-void SSD1306::SPI_Interrupt(){
-	if (status==2);
-	else if (status==0){
-        lineCommands[0]=0xB0 + counter;
-        lineCommands[1]=0x00;
-        lineCommands[2]=0x10;
-        status=1;
-		WriteCommand();
+void SSD1306::SPI_Interrupt_DMA(){
+	if (dma_status==true){
+		if (status==2);
+		else if (status==0){
+			lineCommands[0]=0xB0 + counter;
+			lineCommands[1]=0x00;
+			lineCommands[2]=0x10;
+			status=1;
+			WriteCommand();
+		}
+		else{
+			status=0;
+			counter+=1;
+			if (counter==8)
+				counter=0;
+			WriteData();
+		}
 	}
-	else{
-		status=0;
-		counter+=1;
-		if (counter==8)
-			counter=0;
+}
+
+void SSD1306::SendWithoutDma(){
+	for (int i=0; i<8; i++){
+		counter=i;
+		lineCommands[0]=0xB0;
+		lineCommands[1]=0x00;
+		lineCommands[2]=0x10;
+		WriteCommand();
 		WriteData();
 	}
 }
@@ -148,9 +161,9 @@ void SSD1306::Init(void) {
     initialized = 1;
 
     Fill(White);
-    HAL_SPI_Transmit_DMA(&SSD1306_SPI_PORT, initCommands, 28);
+    HAL_SPI_Transmit_DMA(SSD1306_SPI_PORT, initCommands, 28);
     status=0;
-    SPI_Interrupt();
+    SPI_Interrupt_DMA();
 }
 
 void SSD1306::process(){
@@ -255,13 +268,17 @@ void SSD1306::SetCursor(uint8_t x, uint8_t y) {
     currentY = y;
 }
 
-SSD1306::SSD1306(I2C_HandleTypeDef i2c, int I2C_ADDR, GPIO_TypeDef CLK_PIN,
-		GPIO_TypeDef MOSI_PIN, bool dma_switch, int height, int width){
+void SSD1306::SwitchDMA(bool dma){
+	dma_status=dma;
+}
+
+SSD1306::SSD1306(I2C_HandleTypeDef* i2c, int I2C_ADDRESS, GPIO_TypeDef* CLK_PORT,
+		GPIO_TypeDef* MOSI_PORT, int height, int width){
 	this->SSD1306_I2C_PORT=i2c;
 	this->I2C_ADDR=I2C_ADDR;
-	this->CLK_PIN=CLK_PIN;
-	this->MOSI_PIN=MOSI_PIN;
-	this->dma_switch=dma_switch;
+	this->CLK_PORT=CLK_PORT;
+	this->MOSI_PORT=MOSI_PORT;
+	this->dma_status=false;
 	this->height=height;
 	this->width=width;
 	i2c_or_spi="i2c";
@@ -269,16 +286,16 @@ SSD1306::SSD1306(I2C_HandleTypeDef i2c, int I2C_ADDR, GPIO_TypeDef CLK_PIN,
 	AllocBuffer();
 }
 
-SSD1306::SSD1306(SPI_HandleTypeDef spi, GPIO_TypeDef CLK_PIN, GPIO_TypeDef MOSI_PIN,
-		GPIO_TypeDef RESET_PIN, GPIO_TypeDef CS_PIN, GPIO_TypeDef DC_PIN,
-		bool dma_switch, int height, int width) {
+SSD1306::SSD1306(SPI_HandleTypeDef* spi, GPIO_TypeDef* CLK_PORT, GPIO_TypeDef* MOSI_PORT,
+		GPIO_TypeDef* RESET_PORT, GPIO_TypeDef* CS_PORT, GPIO_TypeDef* DC_PORT,
+		int height, int width) {
 	this->SSD1306_SPI_PORT = spi;
-	this->CLK_PIN=CLK_PIN;
-	this->MOSI_PIN=MOSI_PIN;
-	this->RESET_PIN=RESET_PIN;
-	this->CS_PIN=CS_PIN;
-	this->DC_PIN=DC_PIN;
-	this->dma_switch=dma_switch;
+	this->CLK_PORT=CLK_PORT;
+	this->MOSI_PORT=MOSI_PORT;
+	this->RESET_PORT=RESET_PORT;
+	this->CS_PORT=CS_PORT;
+	this->DC_PORT=DC_PORT;
+	this->dma_status=false;
 	this->height=height;
 	this->width=width;
 	i2c_or_spi="spi";
