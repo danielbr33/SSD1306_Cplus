@@ -160,7 +160,9 @@ void SSD1306::Init(void) {
 
     Fill(White);
     HAL_SPI_Transmit_DMA(SSD1306_SPI_PORT, initCommands, 28);
+    HAL_Delay(100);
     status=0;
+    SPI_Interrupt_DMA();
 }
 
 void SSD1306::process(){
