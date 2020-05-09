@@ -25,7 +25,6 @@
 /* USER CODE BEGIN Includes */
 #include "SSD1306_font.h"
 #include "SSD1306.h"
-
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -48,7 +47,8 @@ SPI_HandleTypeDef hspi2;
 DMA_HandleTypeDef hdma_spi2_tx;
 
 /* USER CODE BEGIN PV */
-//SSD1306 oled(hspi2, OLED_SCK_Pin, OLED_MOSI_Pin, OLED_RESET_Pin, OLED_CS_Pin, OLED_DC_Pin, true);
+SSD1306* oled = new SSD1306(&hspi2, OLED_RESET_GPIO_Port, OLED_RESET_Pin, OLED_CS_GPIO_Port,
+			OLED_CS_Pin, OLED_DC_GPIO_Port, OLED_DC_Pin, 64, 128);
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -59,7 +59,7 @@ void MX_SPI2_Init(void);
 /* USER CODE BEGIN PFP */
 
 void HAL_SPI_TxCpltCallback(SPI_HandleTypeDef *hspi){
-//	oled.SPI_Interrupt();
+	oled->SPI_Interrupt_DMA();
 };
 /* USER CODE END PFP */
 
@@ -99,15 +99,17 @@ int main(void)
   MX_DMA_Init();
   MX_SPI2_Init();
   /* USER CODE BEGIN 2 */
-//  oled.Init();
-//  //oled.ssd1306_Fill(White);
-//  oled.WriteString("/////////////",Font_7x10,White);
-//  oled.SetCursor(0,15);
-//  oled.WriteString("//////////////",Font_7x10,Black);
-//  oled.SetCursor(0,30);
-//  oled.WriteString("/////////////",Font_7x10,White);
-//  oled.SetCursor(0,45);
-// // oled.WriteString("///////////",Font_7x10,Black);
+  oled->SwitchDMA(true);
+  oled->Init();
+  oled->Fill(White);
+  //oled->SendWithoutDma();
+  oled->WriteString("/////////////",Font_7x10,White);
+  oled->SetCursor(0,15);
+  oled->WriteString("//////////////",Font_7x10,Black);
+  oled->SetCursor(0,30);
+  oled->WriteString("/////////////",Font_7x10,White);
+  oled->SetCursor(0,45);
+  oled->WriteString("///////////",Font_7x10,Black);
   HAL_Delay(1000);
   /* USER CODE END 2 */
 

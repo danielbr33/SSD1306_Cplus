@@ -15,11 +15,12 @@
 #include "_ansi.h"
 #include "SSD1306_font.h"
 
+//------------------------------------------------------
 #define MIRROR_VERTICAL_NO
 #define MIRROR_HORIZONTAL_NO
 #define INVERSE_COLOR_NO
-
 #define STM32F3
+//-------------------------------------------------------
 #if defined(STM32F1)
 #include "stm32f1xx_hal.h"
 #elif defined(STM32F4)
@@ -81,11 +82,11 @@ typedef enum {
 
 class SSD1306 {
 public:
-	SSD1306(I2C_HandleTypeDef* i2c, int I2C_ADDRESS, GPIO_TypeDef* CLK_PORT,
-			GPIO_TypeDef* MOSI_PORT, int height, int width);
-	SSD1306(SPI_HandleTypeDef* spi, GPIO_TypeDef* CLK_PORT, GPIO_TypeDef* MOSI_PORT,
-			GPIO_TypeDef* RESET_PORT, GPIO_TypeDef* CS_PORT, GPIO_TypeDef* DC_PORT,
+	SSD1306(I2C_HandleTypeDef* i2c, int I2C_ADDRESS, int height, int width);
+	SSD1306(SPI_HandleTypeDef* spi, GPIO_TypeDef* RESET_PORT, uint16_t RESET_PIN,
+			GPIO_TypeDef* CS_PORT, uint16_t CS_PIN, GPIO_TypeDef* DC_PORT, uint16_t DC_PIN,
 			int height, int width);
+	SSD1306();
 	virtual ~SSD1306();
 	// Procedure definitions
 	void SwitchDMA(bool dma);
@@ -106,11 +107,12 @@ private:
 	I2C_HandleTypeDef* SSD1306_I2C_PORT;
 	int I2C_ADDR;	//(0x3C << 1)
 	SPI_HandleTypeDef* SSD1306_SPI_PORT;
-	GPIO_TypeDef* MOSI_PORT;
-	GPIO_TypeDef* CLK_PORT;
 	GPIO_TypeDef* DC_PORT;
 	GPIO_TypeDef* CS_PORT;
 	GPIO_TypeDef* RESET_PORT;
+	uint16_t DC_PIN;
+	uint16_t CS_PIN;
+	uint16_t RESET_PIN;
 	bool dma_status;
 	int height; 	//64
 	int width;		//128

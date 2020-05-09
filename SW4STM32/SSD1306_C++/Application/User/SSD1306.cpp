@@ -97,7 +97,7 @@ void SSD1306::Init(void) {
 
     initCommands[3]=SET_PAGE_START_ADDR;
 
-	#ifdef MIRROR_VERTICAL
+	#ifdef MIRROR_VERTICAL_ON
 		initCommands[4]=MIRROR_VERTICAL;
 	#else
 		initCommands[4]=COM_SCAN_DIRECTION;
@@ -111,13 +111,13 @@ void SSD1306::Init(void) {
     initCommands[8]=SET_CONTRAST;
     initCommands[9]=CONTRAST;
 
-	#ifdef MIRROR_HORIZ
+	#ifdef MIRROR_HORIZ_ON
 		initCommands[10]=MIRROR_HORIZONTAL;
 	#else
 		initCommands[10]=SET_SEGMENT_REMAP;
 	#endif
 
-	#ifdef SSD1306_INVERSE_COLOR
+	#ifdef SSD1306_INVERSE_COLOR_ON
 		initCommands[11]=INVERSE_COLOR;
 	#else
 		initCommands[11]=NORMAL_COLOR;
@@ -128,7 +128,6 @@ void SSD1306::Init(void) {
 		initCommands[13]=RATIO_32;
 	else if (height == 64)
 		initCommands[13]=RATIO_64;
-	else
 
     initCommands[14]=OUT_FOLLOW_RAM_CONTENT;
 
@@ -146,7 +145,6 @@ void SSD1306::Init(void) {
 		initCommands[22]=COM_PIN_32;
 	else if (height == 64)
 		initCommands[22]=COM_PIN_64;
-	else
 
     initCommands[23]=SET_VCOMH;
     initCommands[24]=VOLTAGE_77;
@@ -163,7 +161,6 @@ void SSD1306::Init(void) {
     Fill(White);
     HAL_SPI_Transmit_DMA(SSD1306_SPI_PORT, initCommands, 28);
     status=0;
-    SPI_Interrupt_DMA();
 }
 
 void SSD1306::process(){
@@ -272,12 +269,9 @@ void SSD1306::SwitchDMA(bool dma){
 	dma_status=dma;
 }
 
-SSD1306::SSD1306(I2C_HandleTypeDef* i2c, int I2C_ADDRESS, GPIO_TypeDef* CLK_PORT,
-		GPIO_TypeDef* MOSI_PORT, int height, int width){
+SSD1306::SSD1306(I2C_HandleTypeDef* i2c, int I2C_ADDRESS, int height, int width){
 	this->SSD1306_I2C_PORT=i2c;
 	this->I2C_ADDR=I2C_ADDR;
-	this->CLK_PORT=CLK_PORT;
-	this->MOSI_PORT=MOSI_PORT;
 	this->dma_status=false;
 	this->height=height;
 	this->width=width;
@@ -286,15 +280,16 @@ SSD1306::SSD1306(I2C_HandleTypeDef* i2c, int I2C_ADDRESS, GPIO_TypeDef* CLK_PORT
 	AllocBuffer();
 }
 
-SSD1306::SSD1306(SPI_HandleTypeDef* spi, GPIO_TypeDef* CLK_PORT, GPIO_TypeDef* MOSI_PORT,
-		GPIO_TypeDef* RESET_PORT, GPIO_TypeDef* CS_PORT, GPIO_TypeDef* DC_PORT,
+SSD1306::SSD1306(SPI_HandleTypeDef* spi, GPIO_TypeDef* RESET_PORT, uint16_t RESET_PIN,
+		GPIO_TypeDef* CS_PORT, uint16_t CS_PIN, GPIO_TypeDef* DC_PORT, uint16_t DC_PIN,
 		int height, int width) {
 	this->SSD1306_SPI_PORT = spi;
-	this->CLK_PORT=CLK_PORT;
-	this->MOSI_PORT=MOSI_PORT;
 	this->RESET_PORT=RESET_PORT;
+	this->RESET_PIN=RESET_PIN;
 	this->CS_PORT=CS_PORT;
+	this->CS_PIN=CS_PIN;
 	this->DC_PORT=DC_PORT;
+	this->DC_PIN=DC_PIN;
 	this->dma_status=false;
 	this->height=height;
 	this->width=width;
@@ -302,6 +297,9 @@ SSD1306::SSD1306(SPI_HandleTypeDef* spi, GPIO_TypeDef* CLK_PORT, GPIO_TypeDef* M
 	counter=7;
 	AllocBuffer();
 }
+SSD1306::SSD1306(){
+
+};
 
 SSD1306::~SSD1306() {
 	// TODO Auto-generated destructor stub
