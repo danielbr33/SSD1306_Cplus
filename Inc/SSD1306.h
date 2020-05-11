@@ -70,15 +70,6 @@
 #define SET_DC_ENABLE	0x8D
 #define DC_ENABLE	0x14
 
-// SSD1306 OLED height in pixels
-#ifndef SSD1306_HEIGHT
-#define SSD1306_HEIGHT          64
-#endif
-
-// SSD1306 width in pixels
-#ifndef SSD1306_WIDTH
-#define SSD1306_WIDTH           128
-#endif
 
 // Enumeration for screen colors
 typedef enum {
@@ -125,6 +116,8 @@ private:
 
 	uint8_t i2c_or_spi;
 	bool dma_status;
+	int height;
+	int width;
 
     uint16_t currentX;
     uint16_t currentY;

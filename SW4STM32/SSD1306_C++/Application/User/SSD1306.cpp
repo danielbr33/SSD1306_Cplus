@@ -42,15 +42,15 @@ void SSD1306::WriteData() {
 		HAL_GPIO_WritePin(CS_Port, CS_Pin, GPIO_PIN_RESET); // select OLED
 		HAL_GPIO_WritePin(DC_Port, DC_Pin, GPIO_PIN_SET); // data
 		if (dma_status==true)
-			HAL_SPI_Transmit_DMA(SPI_Port, &SSD1306_Buffer[SSD1306_WIDTH*counter], SSD1306_WIDTH);
+			HAL_SPI_Transmit_DMA(SPI_Port, &SSD1306_Buffer[width*counter], width);
 		else
-			HAL_SPI_Transmit(SPI_Port, &SSD1306_Buffer[SSD1306_WIDTH*counter], SSD1306_WIDTH, HAL_MAX_DELAY);
+			HAL_SPI_Transmit(SPI_Port, &SSD1306_Buffer[width*counter], width, HAL_MAX_DELAY);
 	}
 	else{
 		if (dma_status==true)
-			HAL_I2C_Mem_Write_DMA(I2C_Port, I2C_ADDR, 0x40, 1, &SSD1306_Buffer[SSD1306_WIDTH*counter], SSD1306_WIDTH);
+			HAL_I2C_Mem_Write_DMA(I2C_Port, I2C_ADDR, 0x40, 1, &SSD1306_Buffer[width*counter], width);
 		else
-			HAL_I2C_Mem_Write(I2C_Port, I2C_ADDR, 0x40, 1, &SSD1306_Buffer[SSD1306_WIDTH*counter], SSD1306_WIDTH, HAL_MAX_DELAY);
+			HAL_I2C_Mem_Write(I2C_Port, I2C_ADDR, 0x40, 1, &SSD1306_Buffer[width*counter], width, HAL_MAX_DELAY);
 	}
 }
 
@@ -114,13 +114,10 @@ void SSD1306::Init(void) {
 	#endif
 
     initCommands[12]=SET_MULTIPLEX_RATIO;
-	#if (SSD1306_HEIGHT == 32)
+	if (height == 32)
 		initCommands[13]=RATIO_32;
-	#elif (SSD1306_HEIGHT == 64)
+	else if (height == 64)
 		initCommands[13]=RATIO_64;
-	#else
-	#error "Only 32 or 64 lines of height are supported!"
-	#endif
 
     initCommands[14]=OUT_FOLLOW_RAM_CONTENT;
 
@@ -134,13 +131,10 @@ void SSD1306::Init(void) {
     initCommands[20]=PRE_CHARGE_PERIOD;
 
     initCommands[21]=SET_COM_PIN;
-	#if (SSD1306_HEIGHT == 32)
+	if (height == 32)
 		initCommands[22]=COM_PIN_32;
-	#elif (SSD1306_HEIGHT == 64)
+	else if (height == 64)
 		initCommands[22]=COM_PIN_64;
-	#else
-	#error "Only 32 or 64 lines of height are supported!"
-	#endif
 
     initCommands[23]=SET_VCOMH;
     initCommands[24]=VOLTAGE_77;
@@ -170,7 +164,7 @@ void SSD1306::Fill(SSD1306_COLOR color) {
     /* Set memory */
     uint32_t i;
 
-    for(i = 0; i < SSD1306_WIDTH * SSD1306_HEIGHT /8; i++) {
+    for(i = 0; i < width * height /8; i++) {
         SSD1306_Buffer[i] = (color == Black) ? 0x00 : 0xFF;
     }
 }
@@ -180,7 +174,7 @@ void SSD1306::Fill(SSD1306_COLOR color) {
 //    Y => Y Coordinate
 //    color => Pixel color
 void SSD1306::DrawPixel(uint8_t x, uint8_t y, SSD1306_COLOR color) {
-    if(x >= SSD1306_WIDTH || y >= SSD1306_HEIGHT) {
+    if(x >= width || y >= height) {
         // Don't write outside the buffer
         return;
     }
@@ -192,9 +186,9 @@ void SSD1306::DrawPixel(uint8_t x, uint8_t y, SSD1306_COLOR color) {
 
     // Draw in the right color
     if(color == White) {
-        SSD1306_Buffer[x + (y / 8) * SSD1306_WIDTH] |= 1 << (y % 8);
+        SSD1306_Buffer[x + (y / 8) * width] |= 1 << (y % 8);
     } else {
-        SSD1306_Buffer[x + (y / 8) * SSD1306_WIDTH] &= ~(1 << (y % 8));
+        SSD1306_Buffer[x + (y / 8) * width] &= ~(1 << (y % 8));
     }
 }
 
@@ -210,8 +204,8 @@ char SSD1306::WriteChar(char ch, FontDef Font, SSD1306_COLOR color) {
         return 0;
 
     // Check remaining space on current line
-    if (SSD1306_WIDTH < (currentX + Font.FontWidth) ||
-        SSD1306_HEIGHT < (currentY + Font.FontHeight))
+    if (width < (currentX + Font.FontWidth) ||
+        height < (currentY + Font.FontHeight))
     {
         // Not enough space on current line
         return 0;
@@ -263,13 +257,15 @@ SSD1306::SSD1306(I2C_HandleTypeDef* i2c, int I2C_ADDRESS, int height, int width)
 	this->I2C_Port=i2c;
 	this->I2C_ADDR=I2C_ADDR;
 	this->dma_status=false;
+	this->height=height;
+	this->width=width;
 	i2c_or_spi=1;
 	counter=7;
 	AllocBuffer();
 }
 
 void SSD1306::AllocBuffer(){
-//	this->SSD1306_Buffer=new uint8_t[SSD1306_WIDTH * SSD1306_HEIGHT /8];
+//	this->SSD1306_Buffer=new uint8_t[width * height /8];
 	this->SSD1306_Buffer=new uint8_t[1];
 }
 
@@ -288,6 +284,8 @@ SSD1306::SSD1306(SPI_HandleTypeDef* spi, GPIO_TypeDef* RESET_PORT, uint16_t RESE
 	this->DC_Port=DC_PORT;
 	this->DC_Pin=DC_PIN;
 	this->dma_status=false;
+	this->height=height;
+	this->width=width;
 	i2c_or_spi=0;
 	counter=7;
 	AllocBuffer();
