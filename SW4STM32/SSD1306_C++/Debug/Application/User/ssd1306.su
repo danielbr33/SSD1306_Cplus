@@ -1,18 +1,18 @@
-SSD1306.cpp:262:1:SSD1306::~SSD1306()	0	static
-SSD1306.cpp:262:1:virtual SSD1306::~SSD1306()	8	static
-SSD1306.cpp:264:1:void __static_initialization_and_destruction_0(int, int)	8	static
+SSD1306.cpp:274:1:SSD1306::~SSD1306()	0	static
+SSD1306.cpp:274:1:virtual SSD1306::~SSD1306()	8	static
+SSD1306.cpp:276:1:void __static_initialization_and_destruction_0(int, int)	8	static
 SSD1306.cpp:10:6:void SSD1306::Reset()	8	static
-SSD1306.cpp:21:6:void SSD1306::WriteCommand()	8	static
-SSD1306.cpp:27:6:void SSD1306::WriteData()	8	static
-SSD1306.cpp:34:6:void SSD1306::SPI_Interrupt_DMA()	8	static
-SSD1306.cpp:139:6:void SSD1306::process()	8	static
-SSD1306.cpp:145:6:void SSD1306::Fill(SSD1306_COLOR)	4	static
-SSD1306.cpp:52:6:void SSD1306::Init()	16	static
-SSD1306.cpp:158:6:void SSD1306::DrawPixel(uint8_t, uint8_t, SSD1306_COLOR)	4	static
-SSD1306.cpp:181:6:char SSD1306::WriteChar(char, FontDef, SSD1306_COLOR)	56	static
-SSD1306.cpp:216:6:char SSD1306::WriteString(char*, FontDef, SSD1306_COLOR)	32	static
-SSD1306.cpp:233:6:void SSD1306::SetCursor(uint8_t, uint8_t)	0	static
-SSD1306.cpp:238:1:SSD1306::SSD1306(I2C_HandleTypeDef*, int, int, int)	0	static
-SSD1306.cpp:244:1:SSD1306::SSD1306(SPI_HandleTypeDef*, GPIO_TypeDef*, uint16_t, GPIO_TypeDef*, uint16_t, GPIO_TypeDef*, uint16_t, int, int)	8	static
-SSD1306.cpp:257:1:SSD1306::SSD1306()	0	static
-SSD1306.cpp:264:1:cpp)	8	static
+SSD1306.cpp:21:6:void SSD1306::WriteCommand()	16	static
+SSD1306.cpp:32:6:void SSD1306::WriteData()	16	static
+SSD1306.cpp:44:6:void SSD1306::SPI_Interrupt_DMA()	8	static
+SSD1306.cpp:149:6:void SSD1306::process()	8	static
+SSD1306.cpp:155:6:void SSD1306::Fill(SSD1306_COLOR)	4	static
+SSD1306.cpp:62:6:void SSD1306::Init()	16	static
+SSD1306.cpp:168:6:void SSD1306::DrawPixel(uint8_t, uint8_t, SSD1306_COLOR)	4	static
+SSD1306.cpp:191:6:char SSD1306::WriteChar(char, FontDef, SSD1306_COLOR)	56	static
+SSD1306.cpp:226:6:char SSD1306::WriteString(char*, FontDef, SSD1306_COLOR)	32	static
+SSD1306.cpp:243:6:void SSD1306::SetCursor(uint8_t, uint8_t)	0	static
+SSD1306.cpp:248:1:SSD1306::SSD1306(I2C_HandleTypeDef*, int, int, int)	0	static
+SSD1306.cpp:255:1:SSD1306::SSD1306(SPI_HandleTypeDef*, GPIO_TypeDef*, uint16_t, GPIO_TypeDef*, uint16_t, GPIO_TypeDef*, uint16_t, int, int)	8	static
+SSD1306.cpp:269:1:SSD1306::SSD1306()	0	static
+SSD1306.cpp:276:1:cpp)	8	static

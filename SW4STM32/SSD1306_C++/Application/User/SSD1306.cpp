@@ -19,15 +19,25 @@ void SSD1306::Reset(void) {
 }
 // Send a byte to the command register
 void SSD1306::WriteCommand() {
-    HAL_GPIO_WritePin(CS_Port, CS_Pin, GPIO_PIN_RESET); // select OLED
-    HAL_GPIO_WritePin(DC_Port, DC_Pin, GPIO_PIN_RESET); // command
-	HAL_SPI_Transmit_DMA(SPI_Port, lineCommands, 3);
+	if (i2c_or_spi==0){
+		HAL_GPIO_WritePin(CS_Port, CS_Pin, GPIO_PIN_RESET); // select OLED
+		HAL_GPIO_WritePin(DC_Port, DC_Pin, GPIO_PIN_RESET); // command
+		HAL_SPI_Transmit_DMA(SPI_Port, lineCommands, 3);
+	}
+	else {
+		HAL_I2C_Mem_Write_DMA(I2C_Port, I2C_ADDR, 0x00, 1, lineCommands, 3);
+	}
 }
 // Send data
 void SSD1306::WriteData() {
-    HAL_GPIO_WritePin(CS_Port, CS_Pin, GPIO_PIN_RESET); // select OLED
-    HAL_GPIO_WritePin(DC_Port, DC_Pin, GPIO_PIN_SET); // data
-	HAL_SPI_Transmit_DMA(SPI_Port, &SSD1306_Buffer[SSD1306_WIDTH*counter], SSD1306_WIDTH);
+	if (i2c_or_spi==0){
+		HAL_GPIO_WritePin(CS_Port, CS_Pin, GPIO_PIN_RESET); // select OLED
+		HAL_GPIO_WritePin(DC_Port, DC_Pin, GPIO_PIN_SET); // data
+		HAL_SPI_Transmit_DMA(SPI_Port, &SSD1306_Buffer[SSD1306_WIDTH*counter], SSD1306_WIDTH);
+	}
+	else{
+		HAL_I2C_Mem_Write_DMA(I2C_Port, I2C_ADDR, 0x40, 1, &SSD1306_Buffer[SSD1306_WIDTH*counter], SSD1306_WIDTH);
+	}
 }
 
 
@@ -238,6 +248,7 @@ void SSD1306::SetCursor(uint8_t x, uint8_t y) {
 SSD1306::SSD1306(I2C_HandleTypeDef* i2c, int I2C_ADDRESS, int height, int width){
 	this->I2C_Port=i2c;
 	this->I2C_ADDR=I2C_ADDR;
+	i2c_or_spi=1;
 	counter=7;
 }
 
@@ -251,6 +262,7 @@ SSD1306::SSD1306(SPI_HandleTypeDef* spi, GPIO_TypeDef* RESET_PORT, uint16_t RESE
 	this->CS_Pin=CS_PIN;
 	this->DC_Port=DC_PORT;
 	this->DC_Pin=DC_PIN;
+	i2c_or_spi=0;
 	counter=7;
 }
 
