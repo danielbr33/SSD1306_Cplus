@@ -111,6 +111,7 @@ public:
 	void WriteCommand();
 	void WriteData();
 	void SwitchDMA(bool dma);
+	void AllocBuffer();
 private:
 	I2C_HandleTypeDef* I2C_Port;
 	int I2C_ADDR;	//(0x3C << 1)
@@ -132,7 +133,7 @@ private:
     uint8_t status;
     uint8_t initCommands[28];
     uint8_t lineCommands[3];
-    uint8_t SSD1306_Buffer[SSD1306_WIDTH * SSD1306_HEIGHT /8];
+    uint8_t* SSD1306_Buffer;
     uint8_t counter;
 };
 
