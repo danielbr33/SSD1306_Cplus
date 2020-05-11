@@ -110,6 +110,7 @@ public:
 	void Reset(void);
 	void WriteCommand();
 	void WriteData();
+	void SwitchDMA(bool dma);
 private:
 	I2C_HandleTypeDef* I2C_Port;
 	int I2C_ADDR;	//(0x3C << 1)
@@ -122,6 +123,7 @@ private:
 	uint16_t RESET_Pin;
 
 	uint8_t i2c_or_spi;
+	bool dma_status;
 
     uint16_t currentX;
     uint16_t currentY;
