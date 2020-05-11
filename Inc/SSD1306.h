@@ -121,6 +121,8 @@ private:
 	uint16_t CS_Pin;
 	uint16_t RESET_Pin;
 
+	uint8_t i2c_or_spi;
+
     uint16_t currentX;
     uint16_t currentY;
     uint8_t inverted;
