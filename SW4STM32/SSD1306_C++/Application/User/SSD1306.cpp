@@ -170,7 +170,7 @@ void SSD1306::Fill(SSD1306_COLOR color) {
     /* Set memory */
     uint32_t i;
 
-    for(i = 0; i < sizeof(SSD1306_Buffer); i++) {
+    for(i = 0; i < SSD1306_WIDTH * SSD1306_HEIGHT /8; i++) {
         SSD1306_Buffer[i] = (color == Black) ? 0x00 : 0xFF;
     }
 }
@@ -269,7 +269,8 @@ SSD1306::SSD1306(I2C_HandleTypeDef* i2c, int I2C_ADDRESS, int height, int width)
 }
 
 void SSD1306::AllocBuffer(){
-	this->SSD1306_Buffer=(uint8_t*)malloc(SSD1306_WIDTH * SSD1306_HEIGHT /8);
+//	this->SSD1306_Buffer=new uint8_t[SSD1306_WIDTH * SSD1306_HEIGHT /8];
+	this->SSD1306_Buffer=new uint8_t[1];
 }
 
 void SSD1306::SwitchDMA(bool dma){
