@@ -35,6 +35,9 @@
  #error "SSD1306 library was tested only on STM32F1, STM32F3, STM32F4, STM32F7, STM32L0, STM32L4, STM32H7 MCU families. Please modify ssd1306.h if you know what you are doing. Also please send a pull request if it turns out the library works on other MCU's as well!"
 #endif
 
+#define SSD1306_MIRROR_VERT_OFF
+#define SSD1306_MIRROR_HORIZ_OFF
+#define SSD1306_INVERSE_COLOR_OFF
 
 #define TURN_OFF	0xAE
 #define TURN_ON 	0xAF

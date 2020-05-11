@@ -87,7 +87,7 @@ void SSD1306::Init(void) {
 
     initCommands[3]=SET_PAGE_START_ADDR;
 
-	#ifdef SSD1306_MIRROR_VERT
+	#ifdef SSD1306_MIRROR_VERT_ON
 		initCommands[4]=MIRROR_VERTICAL;
 	#else
 		initCommands[4]=COM_SCAN_DIRECTION;
@@ -101,13 +101,13 @@ void SSD1306::Init(void) {
     initCommands[8]=SET_CONTRAST;
     initCommands[9]=CONTRAST;
 
-	#ifdef SSD1306_MIRROR_HORIZ
+	#ifdef SSD1306_MIRROR_HORIZ_NO
 		initCommands[10]=MIRROR_HORIZONTAL;
 	#else
 		initCommands[10]=SET_SEGMENT_REMAP;
 	#endif
 
-	#ifdef SSD1306_INVERSE_COLOR
+	#ifdef SSD1306_INVERSE_COLOR_NO
 		initCommands[11]=INVERSE_COLOR;
 	#else
 		initCommands[11]=NORMAL_COLOR;
