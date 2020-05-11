@@ -265,6 +265,11 @@ SSD1306::SSD1306(I2C_HandleTypeDef* i2c, int I2C_ADDRESS, int height, int width)
 	this->dma_status=false;
 	i2c_or_spi=1;
 	counter=7;
+	AllocBuffer();
+}
+
+void SSD1306::AllocBuffer(){
+	this->SSD1306_Buffer=(uint8_t*)malloc(SSD1306_WIDTH * SSD1306_HEIGHT /8);
 }
 
 void SSD1306::SwitchDMA(bool dma){
@@ -284,6 +289,7 @@ SSD1306::SSD1306(SPI_HandleTypeDef* spi, GPIO_TypeDef* RESET_PORT, uint16_t RESE
 	this->dma_status=false;
 	i2c_or_spi=0;
 	counter=7;
+	AllocBuffer();
 }
 
 SSD1306::SSD1306() {
