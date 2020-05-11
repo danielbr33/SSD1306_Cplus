@@ -70,55 +70,6 @@
 #define SET_DC_ENABLE	0x8D
 #define DC_ENABLE	0x14
 
-
-#define SSD1306_USE_SPI
-
-/* vvv I2C config vvv */
-#ifndef SSD1306_I2C_PORT
-#define SSD1306_I2C_PORT		hi2c1
-#endif
-
-
-#ifndef SSD1306_I2C_ADDR
-#define SSD1306_I2C_ADDR        (0x3C << 1)
-#endif
-/* ^^^ I2C config ^^^ */
-
-/* vvv SPI config vvv */
-#ifndef SSD1306_SPI_PORT
-#define SSD1306_SPI_PORT        hspi2
-#endif
-
-#ifndef SSD1306_CS_Port
-#define SSD1306_CS_Port         GPIOB
-#endif
-#ifndef SSD1306_CS_Pin
-#define SSD1306_CS_Pin          GPIO_PIN_12
-#endif
-
-#ifndef SSD1306_DC_Port
-#define SSD1306_DC_Port         GPIOB
-#endif
-#ifndef SSD1306_DC_Pin
-#define SSD1306_DC_Pin          GPIO_PIN_14
-#endif
-
-#ifndef SSD1306_Reset_Port
-#define SSD1306_Reset_Port      GPIOA
-#endif
-#ifndef SSD1306_Reset_Pin
-#define SSD1306_Reset_Pin       GPIO_PIN_8
-#endif
-/* ^^^ SPI config ^^^ */
-
-#if defined(SSD1306_USE_I2C)
-extern I2C_HandleTypeDef SSD1306_I2C_PORT;
-#elif defined(SSD1306_USE_SPI)
-extern SPI_HandleTypeDef SSD1306_SPI_PORT;
-#else
-#error "You should define SSD1306_USE_SPI or SSD1306_USE_I2C macro!"
-#endif
-
 // SSD1306 OLED height in pixels
 #ifndef SSD1306_HEIGHT
 #define SSD1306_HEIGHT          64
@@ -139,6 +90,10 @@ typedef enum {
 
 class SSD1306 {
 public:
+	SSD1306(I2C_HandleTypeDef* i2c, int I2C_ADDRESS, int height, int width);
+	SSD1306(SPI_HandleTypeDef* spi, GPIO_TypeDef* RESET_PORT, uint16_t RESET_PIN,
+			GPIO_TypeDef* CS_PORT, uint16_t CS_PIN, GPIO_TypeDef* DC_PORT, uint16_t DC_PIN,
+			int height, int width);
 	SSD1306();
 	virtual ~SSD1306();
 	// Procedure definitions
@@ -149,13 +104,23 @@ public:
 	char WriteString(char* str, FontDef Font, SSD1306_COLOR color);
 	void SetCursor(uint8_t x, uint8_t y);
 	void process(void);
-	void SPI_Interrupt();
+	void SPI_Interrupt_DMA();
 	void loop();
 	// Low-level procedures
 	void Reset(void);
 	void WriteCommand();
 	void WriteData();
 private:
+	I2C_HandleTypeDef* I2C_Port;
+	int I2C_ADDR;	//(0x3C << 1)
+	SPI_HandleTypeDef* SPI_Port;
+	GPIO_TypeDef* DC_Port;
+	GPIO_TypeDef* CS_Port;
+	GPIO_TypeDef* RESET_Port;
+	uint16_t DC_Pin;
+	uint16_t CS_Pin;
+	uint16_t RESET_Pin;
+
     uint16_t currentX;
     uint16_t currentY;
     uint8_t inverted;
