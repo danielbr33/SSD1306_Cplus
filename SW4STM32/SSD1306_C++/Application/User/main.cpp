@@ -100,6 +100,7 @@ int main(void)
   MX_SPI2_Init();
   /* USER CODE BEGIN 2 */
   oled->Init();
+  oled->SwitchDMA(true);
   oled->Fill(White);
   oled->WriteString("/////////////",Font_7x10,White);
   oled->SetCursor(0,15);
