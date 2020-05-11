@@ -54,8 +54,7 @@ void SSD1306::WriteData() {
 
 void SSD1306::SPI_Interrupt_DMA(){
 	if (dma_status==true){
-		if (status==2);
-		else if (status==0){
+		if (status==0){
 			lineCommands[0]=0xB0 + counter;
 			lineCommands[1]=0x00;
 			lineCommands[2]=0x10;
@@ -153,16 +152,14 @@ void SSD1306::Init(void) {
     initCommands[26]=DC_ENABLE;
     initCommands[27]=TURN_ON;
 
-    status=2;
     currentX = 0;
     currentY = 0;
     initialized = 1;
 
+    status=0;
     Fill(White);
     HAL_SPI_Transmit_DMA(SSD1306_SPI_PORT, initCommands, 28);
-    HAL_Delay(100);
-    status=0;
-    SPI_Interrupt_DMA();
+
 }
 
 void SSD1306::process(){
@@ -171,7 +168,7 @@ void SSD1306::process(){
 }
 
 void SSD1306::AllocBuffer(){
-	this->SSD1306_Buffer=(uint8_t*)malloc(width * height /8);
+	this->SSD1306_Buffer=(uint8_t*)malloc(width * height /8*sizeof(uint8_t));
 }
 // Fill the whole screen with the given color
 void SSD1306::Fill(SSD1306_COLOR color) {

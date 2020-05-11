@@ -102,7 +102,6 @@ int main(void)
   oled->SwitchDMA(true);
   oled->Init();
   oled->Fill(White);
-  //oled->SendWithoutDma();
   oled->WriteString("/////////////",Font_7x10,White);
   oled->SetCursor(0,15);
   oled->WriteString("//////////////",Font_7x10,Black);
