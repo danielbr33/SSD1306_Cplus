@@ -106,6 +106,11 @@ public:
 	void WriteData();
 	void SwitchDMA(uint8_t dma);
 	void AllocBuffer();
+
+	struct gpio_struct {
+	GPIO_TypeDef* port;
+	 uint16_t pin;
+	}
 private:
 	I2C_HandleTypeDef* I2C_Port;
 	int I2C_ADDR;	//(0x3C << 1)
