@@ -257,7 +257,7 @@ void SSD1306::SetCursor(uint8_t x, uint8_t y) {
 SSD1306::SSD1306(I2C_HandleTypeDef* i2c, int I2C_ADDRESS, int height, int width){
 	this->I2C_Port=i2c;
 	this->I2C_ADDR=I2C_ADDR;
-	this->dma_status=false;
+	this->dma_status=0;
 	this->height=height;
 	this->width=width;
 	i2c_or_spi=1;
@@ -284,7 +284,7 @@ SSD1306::SSD1306(SPI_HandleTypeDef* spi, GPIO_TypeDef* RESET_PORT, uint16_t RESE
 	this->CS_Pin=CS_PIN;
 	this->DC_Port=DC_PORT;
 	this->DC_Pin=DC_PIN;
-	this->dma_status=false;
+	this->dma_status=0;
 	this->height=height;
 	this->width=width;
 	i2c_or_spi=0;

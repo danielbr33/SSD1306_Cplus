@@ -99,9 +99,9 @@ int main(void)
   MX_DMA_Init();
   MX_SPI2_Init();
   /* USER CODE BEGIN 2 */
-  gpio_struct  gpio_rest;
-  gpio_rest.port = RESET_PORT;
-  gpio_rest.pin= RESET_PIN;
+  SSD1306::gpio_struct  gpio_reset;
+  gpio_reset.port = OLED_RESET_GPIO_Port;
+  gpio_reset.pin= OLED_RESET_Pin;
   oled->SwitchDMA(1);
   oled->Init();
   oled->Fill(White);
