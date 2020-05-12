@@ -274,27 +274,21 @@ void SSD1306::SwitchDMA(uint8_t dma){
 	dma_status=dma;
 }
 
-SSD1306::SSD1306(SPI_HandleTypeDef* spi, GPIO_TypeDef* RESET_PORT, uint16_t RESET_PIN,
-		GPIO_TypeDef* CS_PORT, uint16_t CS_PIN, GPIO_TypeDef* DC_PORT, uint16_t DC_PIN,
-		int height, int width) {
+SSD1306::SSD1306(SPI_HandleTypeDef* spi, gpio_struct reset, gpio_struct DC,
+			gpio_struct CS, int height, int width) {
 	this->SPI_Port = spi;
-	this->RESET_Port=RESET_PORT;
-	this->RESET_Pin=RESET_PIN;
-	this->CS_Port=CS_PORT;
-	this->CS_Pin=CS_PIN;
-	this->DC_Port=DC_PORT;
-	this->DC_Pin=DC_PIN;
+	this->RESET_Port = reset.port;
+	this->RESET_Pin = reset.pin;
+	this->CS_Port = CS.port;
+	this->CS_Pin = CS.pin;
+	this->DC_Port = DC.port;
+	this->DC_Pin = DC.pin;
 	this->dma_status=0;
 	this->height=height;
 	this->width=width;
 	i2c_or_spi=0;
 	counter=7;
 	AllocBuffer();
-}
-
-SSD1306::SSD1306() {
-	// TODO Auto-generated constructor stub
-	counter=7;
 }
 
 SSD1306::~SSD1306() {

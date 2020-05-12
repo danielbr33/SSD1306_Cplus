@@ -84,11 +84,14 @@ typedef enum {
 
 class SSD1306 {
 public:
+
+	struct gpio_struct {
+	GPIO_TypeDef* port;
+	 uint16_t pin;
+	};
+
 	SSD1306(I2C_HandleTypeDef* i2c, int I2C_ADDRESS, int height, int width);
-	SSD1306(SPI_HandleTypeDef* spi, GPIO_TypeDef* RESET_PORT, uint16_t RESET_PIN,
-			GPIO_TypeDef* CS_PORT, uint16_t CS_PIN, GPIO_TypeDef* DC_PORT, uint16_t DC_PIN,
-			int height, int width);
-	SSD1306();
+	SSD1306(SPI_HandleTypeDef* spi, gpio_struct reset, gpio_struct DC, gpio_struct CS, int height, int width);
 	virtual ~SSD1306();
 	// Procedure definitions
 	void Init(void);
@@ -107,10 +110,6 @@ public:
 	void SwitchDMA(uint8_t dma);
 	void AllocBuffer();
 
-	struct gpio_struct {
-	GPIO_TypeDef* port;
-	 uint16_t pin;
-	};
 private:
 	I2C_HandleTypeDef* I2C_Port;
 	int I2C_ADDR;	//(0x3C << 1)

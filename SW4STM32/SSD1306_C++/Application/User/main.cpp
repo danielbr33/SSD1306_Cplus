@@ -47,8 +47,19 @@ SPI_HandleTypeDef hspi2;
 DMA_HandleTypeDef hdma_spi2_tx;
 
 /* USER CODE BEGIN PV */
-SSD1306* oled = new SSD1306(&hspi2, OLED_RESET_GPIO_Port, OLED_RESET_Pin, OLED_CS_GPIO_Port,
-			OLED_CS_Pin, OLED_DC_GPIO_Port, OLED_DC_Pin, 64, 128);
+SSD1306::gpio_struct  gpio_reset;
+gpio_reset.port = OLED_RESET_GPIO_Port;
+gpio_reset.pin= OLED_RESET_Pin;
+
+SSD1306::gpio_struct gpio_dc;
+gpio_dc.port = OLED_DC_GPIO_Port;
+gpio_dc.pin = OLED_DC_Pin;
+
+SSD1306::gpio_struct gpio_cs;
+gpio_cs.port = OLED_CS_GPIO_Port;
+gpio_cs.pin = OLED_CS_Pin;
+
+SSD1306* oled = new SSD1306(&hspi2, gpio_reset, gpio_dc, gpio_cs, 64, 128);
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -99,9 +110,6 @@ int main(void)
   MX_DMA_Init();
   MX_SPI2_Init();
   /* USER CODE BEGIN 2 */
-  SSD1306::gpio_struct  gpio_reset;
-  gpio_reset.port = OLED_RESET_GPIO_Port;
-  gpio_reset.pin= OLED_RESET_Pin;
   oled->SwitchDMA(1);
   oled->Init();
   oled->Fill(White);

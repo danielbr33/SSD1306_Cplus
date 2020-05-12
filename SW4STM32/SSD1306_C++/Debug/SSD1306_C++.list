@@ -25,25 +25,25 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   ALLOC
  10 .ARM.attributes 00000030  00000000  00000000  000402d0  2**0
                   CONTENTS, READONLY
- 11 .debug_line   00009939  00000000  00000000  00040300  2**0
+ 11 .debug_line   0000993b  00000000  00000000  00040300  2**0
                   CONTENTS, READONLY, DEBUGGING
- 12 .debug_info   00018ac4  00000000  00000000  00049c39  2**0
+ 12 .debug_info   00018ada  00000000  00000000  00049c3b  2**0
                   CONTENTS, READONLY, DEBUGGING
- 13 .debug_abbrev 00002c83  00000000  00000000  000626fd  2**0
+ 13 .debug_abbrev 00002c83  00000000  00000000  00062715  2**0
                   CONTENTS, READONLY, DEBUGGING
- 14 .debug_aranges 00000a08  00000000  00000000  00065380  2**3
+ 14 .debug_aranges 00000a08  00000000  00000000  00065398  2**3
                   CONTENTS, READONLY, DEBUGGING
- 15 .debug_ranges 000009a0  00000000  00000000  00065d88  2**3
+ 15 .debug_ranges 000009a0  00000000  00000000  00065da0  2**3
                   CONTENTS, READONLY, DEBUGGING
- 16 .debug_loc    00007c27  00000000  00000000  00066728  2**0
+ 16 .debug_loc    00007c27  00000000  00000000  00066740  2**0
                   CONTENTS, READONLY, DEBUGGING
- 17 .debug_macro  00021215  00000000  00000000  0006e34f  2**0
+ 17 .debug_macro  00021215  00000000  00000000  0006e367  2**0
                   CONTENTS, READONLY, DEBUGGING
- 18 .debug_str    000a5c6c  00000000  00000000  0008f564  2**0
+ 18 .debug_str    000a5c7c  00000000  00000000  0008f57c  2**0
                   CONTENTS, READONLY, DEBUGGING
- 19 .comment      0000007c  00000000  00000000  001351d0  2**0
+ 19 .comment      0000007c  00000000  00000000  001351f8  2**0
                   CONTENTS, READONLY
- 20 .debug_frame  00015eac  00000000  00000000  0013524c  2**2
+ 20 .debug_frame  00015eac  00000000  00000000  00135274  2**2
                   CONTENTS, READONLY, DEBUGGING
 
 Disassembly of section .text:
@@ -2231,7 +2231,7 @@ SSD1306::SSD1306(SPI_HandleTypeDef* spi, GPIO_TypeDef* RESET_PORT, uint16_t RESE
 	this->DC_Pin=DC_PIN;
  8001564:	f8bd 301c 	ldrh.w	r3, [sp, #28]
  8001568:	8383      	strh	r3, [r0, #28]
-	this->dma_status=false;
+	this->dma_status=0;
  800156a:	2300      	movs	r3, #0
  800156c:	f880 3023 	strb.w	r3, [r0, #35]	; 0x23
 	this->height=height;
