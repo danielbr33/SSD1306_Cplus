@@ -14,7 +14,7 @@ SSD1306.cpp:235:6:char SSD1306::WriteString(char*, FontDef, SSD1306_COLOR)	32	st
 SSD1306.cpp:252:6:void SSD1306::SetCursor(uint8_t, uint8_t)	0	static
 SSD1306.cpp:268:6:void SSD1306::AllocBuffer()	8	static
 SSD1306.cpp:257:1:SSD1306::SSD1306(I2C_HandleTypeDef*, int, int, int)	8	static
-SSD1306.cpp:273:6:void SSD1306::SwitchDMA(bool)	0	static
+SSD1306.cpp:273:6:void SSD1306::SwitchDMA(uint8_t)	0	static
 SSD1306.cpp:277:1:SSD1306::SSD1306(SPI_HandleTypeDef*, GPIO_TypeDef*, uint16_t, GPIO_TypeDef*, uint16_t, GPIO_TypeDef*, uint16_t, int, int)	16	static
 SSD1306.cpp:295:1:SSD1306::SSD1306()	0	static
 SSD1306.cpp:302:1:cpp)	8	static

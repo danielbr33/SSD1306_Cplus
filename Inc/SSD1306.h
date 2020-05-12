@@ -104,7 +104,7 @@ public:
 	void Reset(void);
 	void WriteCommand();
 	void WriteData();
-	void SwitchDMA(bool dma);
+	void SwitchDMA(uint8_t dma);
 	void AllocBuffer();
 private:
 	I2C_HandleTypeDef* I2C_Port;
@@ -118,7 +118,7 @@ private:
 	uint16_t RESET_Pin;
 
 	uint8_t i2c_or_spi;
-	bool dma_status;
+	uint8_t dma_status;
 	int height;
 	int width;
 

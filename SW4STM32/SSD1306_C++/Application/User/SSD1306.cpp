@@ -24,13 +24,13 @@ void SSD1306::WriteCommand() {
 	if (i2c_or_spi==0){
 		HAL_GPIO_WritePin(CS_Port, CS_Pin, GPIO_PIN_RESET); // select OLED
 		HAL_GPIO_WritePin(DC_Port, DC_Pin, GPIO_PIN_RESET); // command
-		if (dma_status==true)
+		if (dma_status==1)
 			HAL_SPI_Transmit_DMA(SPI_Port, lineCommands, 3);
 		else
 			HAL_SPI_Transmit(SPI_Port, lineCommands, 3, HAL_MAX_DELAY);
 	}
 	else {
-		if (dma_status==true)
+		if (dma_status==1)
 			HAL_I2C_Mem_Write_DMA(I2C_Port, I2C_ADDR, 0x00, 1, lineCommands, 3);
 		else
 			HAL_I2C_Mem_Write(I2C_Port, I2C_ADDR, 0x00, 1, lineCommands, 3, HAL_MAX_DELAY);
@@ -41,13 +41,13 @@ void SSD1306::WriteData() {
 	if (i2c_or_spi==0){
 		HAL_GPIO_WritePin(CS_Port, CS_Pin, GPIO_PIN_RESET); // select OLED
 		HAL_GPIO_WritePin(DC_Port, DC_Pin, GPIO_PIN_SET); // data
-		if (dma_status==true)
+		if (dma_status==1)
 			HAL_SPI_Transmit_DMA(SPI_Port, &SSD1306_Buffer[width*counter], width);
 		else
 			HAL_SPI_Transmit(SPI_Port, &SSD1306_Buffer[width*counter], width, HAL_MAX_DELAY);
 	}
 	else{
-		if (dma_status==true)
+		if (dma_status==1)
 			HAL_I2C_Mem_Write_DMA(I2C_Port, I2C_ADDR, 0x40, 1, &SSD1306_Buffer[width*counter], width);
 		else
 			HAL_I2C_Mem_Write(I2C_Port, I2C_ADDR, 0x40, 1, &SSD1306_Buffer[width*counter], width, HAL_MAX_DELAY);
@@ -149,7 +149,7 @@ void SSD1306::Init(void) {
     initialized = 1;
 
     Fill(White);
-    //if (dma_status==true)
+    if (dma_status==1)
     	HAL_SPI_Transmit_DMA(SPI_Port, initCommands, 28);
     status=0;
     SPI_Interrupt_DMA();
@@ -270,7 +270,7 @@ void SSD1306::AllocBuffer(){
 	this->SSD1306_Buffer=new uint8_t[1];
 }
 
-void SSD1306::SwitchDMA(bool dma){
+void SSD1306::SwitchDMA(uint8_t dma){
 	dma_status=dma;
 }
 
