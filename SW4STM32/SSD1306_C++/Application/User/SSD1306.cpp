@@ -149,7 +149,8 @@ void SSD1306::Init(void) {
     initialized = 1;
 
     Fill(White);
-    HAL_SPI_Transmit_DMA(SPI_Port, initCommands, 28);
+    //if (dma_status==true)
+    	HAL_SPI_Transmit_DMA(SPI_Port, initCommands, 28);
     status=0;
     SPI_Interrupt_DMA();
 }
