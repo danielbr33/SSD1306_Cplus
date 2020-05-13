@@ -110,7 +110,7 @@ int main(void)
   MX_DMA_Init();
   MX_SPI2_Init();
   /* USER CODE BEGIN 2 */
-  oled->ChangeDMA(set_on);
+  oled->ChangeDMA(SET_ON);
   oled->Init();
   oled->Fill(White);
   oled->SetCursor(0,0);

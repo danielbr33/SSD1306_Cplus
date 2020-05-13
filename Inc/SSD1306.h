@@ -76,15 +76,8 @@ typedef enum {
     White = 0x01  // Pixel is set. Color depends on OLED
 } SSD1306_COLOR;
 
-typedef enum {
-	set_off = 0,
-	set_on = 1,
-} set_status;
-
-typedef enum {
-	spi=0,
-	i2c=1,
-} connection;
+typedef enum state {SET_OFF, SET_ON};
+typedef enum connection{SPI,I2C};
 
 // Struct to store transformations
 
@@ -108,15 +101,15 @@ public:
 	void SetCursor(uint8_t x, uint8_t y);
 	void process(void);
 	void SPI_Interrupt_DMA();
-	void loop();
+	void SendScreen();
 	// Low-level procedures
 	void Reset(void);
 	void WriteCommand();
 	void WriteData();
-	void ChangeDMA(set_status dma);
-	void ChangeMirrorHorizontal(set_status mirror);
-	void ChangeMirrorVertical(set_status mirror);
-	void ChangeInversionColor(set_status inversion);
+	void ChangeDMA(state dma);
+	void ChangeMirrorHorizontal(state mirror);
+	void ChangeMirrorVertical(state mirror);
+	void ChangeInversionColor(state inversion);
 	void ChangeHeight(uint8_t height);
 	void ChangeWidth(uint8_t width);
 	void AllocBuffer();
@@ -132,11 +125,11 @@ private:
 	uint16_t CS_Pin;
 	uint16_t RESET_Pin;
 
-	uint8_t i2c_or_spi;
-	uint8_t dma_status;
-	uint8_t mirror_vertical_status;
-	uint8_t mirror_horizontal_status;
-	uint8_t inversion_color_status;
+	connection i2c_or_spi;
+	state dma_status;
+	state mirror_vertical_status;
+	state mirror_horizontal_status;
+	state inversion_color_status;
 	int height;
 	int width;
 

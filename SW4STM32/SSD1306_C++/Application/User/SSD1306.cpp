@@ -9,7 +9,7 @@
 
 void SSD1306::Reset(void) {
 	// CS = High (not selected)
-	if(i2c_or_spi==spi){
+	if(i2c_or_spi==SPI){
 		HAL_GPIO_WritePin(CS_Port, CS_Pin, GPIO_PIN_SET);
 
 		// Reset the OLED
@@ -21,16 +21,16 @@ void SSD1306::Reset(void) {
 }
 // Send a byte to the command register
 void SSD1306::WriteCommand() {
-	if (i2c_or_spi==spi){
+	if (i2c_or_spi==SPI){
 		HAL_GPIO_WritePin(CS_Port, CS_Pin, GPIO_PIN_RESET); // select OLED
 		HAL_GPIO_WritePin(DC_Port, DC_Pin, GPIO_PIN_RESET); // command
-		if (dma_status==1)
+		if (dma_status==SET_ON)
 			HAL_SPI_Transmit_DMA(SPI_Port, lineCommands, 3);
 		else
 			HAL_SPI_Transmit(SPI_Port, lineCommands, 3, HAL_MAX_DELAY);
 	}
 	else {
-		if (dma_status==1)
+		if (dma_status==SET_ON)
 			HAL_I2C_Mem_Write_DMA(I2C_Port, I2C_ADDR, 0x00, 1, lineCommands, 3);
 		else
 			HAL_I2C_Mem_Write(I2C_Port, I2C_ADDR, 0x00, 1, lineCommands, 3, HAL_MAX_DELAY);
@@ -38,16 +38,16 @@ void SSD1306::WriteCommand() {
 }
 // Send data
 void SSD1306::WriteData() {
-	if (i2c_or_spi==spi){
+	if (i2c_or_spi==SPI){
 		HAL_GPIO_WritePin(CS_Port, CS_Pin, GPIO_PIN_RESET); // select OLED
 		HAL_GPIO_WritePin(DC_Port, DC_Pin, GPIO_PIN_SET); // data
-		if (dma_status==1)
+		if (dma_status==SET_ON)
 			HAL_SPI_Transmit_DMA(SPI_Port, &SSD1306_Buffer[width*counter], width);
 		else
 			HAL_SPI_Transmit(SPI_Port, &SSD1306_Buffer[width*counter], width, HAL_MAX_DELAY);
 	}
 	else{
-		if (dma_status==1)
+		if (dma_status==SET_ON)
 			HAL_I2C_Mem_Write_DMA(I2C_Port, I2C_ADDR, 0x40, 1, &SSD1306_Buffer[width*counter], width);
 		else
 			HAL_I2C_Mem_Write(I2C_Port, I2C_ADDR, 0x40, 1, &SSD1306_Buffer[width*counter], width, HAL_MAX_DELAY);
@@ -56,21 +56,23 @@ void SSD1306::WriteData() {
 
 
 void SSD1306::SPI_Interrupt_DMA(){
-	if (status==2);
-	else if (status==0){
-        lineCommands[0]=0xB0 + counter;
-        lineCommands[1]=0x00;
-        lineCommands[2]=0x10;
-        status=1;
-		WriteCommand();
-	}
-	else{
-		status=0;
-		counter+=1;
-		if (counter==8)
-			counter=0;
-		WriteData();
-	}
+	//if (dma_status == 1){
+		if (status==2);
+		else if (status==0){
+			lineCommands[0]=0xB0 + counter;
+			lineCommands[1]=0x00;
+			lineCommands[2]=0x10;
+			status=1;
+			WriteCommand();
+		}
+		else{
+			status=0;
+			counter+=1;
+			if (counter==8)
+				counter=0;
+			WriteData();
+		}
+	//}
 }
 
 void SSD1306::Init(void) {
@@ -87,7 +89,7 @@ void SSD1306::Init(void) {
 
     initCommands[3]=SET_PAGE_START_ADDR;
 
-	if (mirror_vertical_status == 1)
+	if (mirror_vertical_status == SET_ON)
 		initCommands[4]=MIRROR_VERTICAL;
 	else
 		initCommands[4]=COM_SCAN_DIRECTION;
@@ -100,12 +102,12 @@ void SSD1306::Init(void) {
     initCommands[8]=SET_CONTRAST;
     initCommands[9]=CONTRAST;
 
-	if (mirror_horizontal_status == 1)
+	if (mirror_horizontal_status == SET_ON)
 		initCommands[10]=MIRROR_HORIZONTAL;
 	else
 		initCommands[10]=SET_SEGMENT_REMAP;
 
-	if (inversion_color_status == 1)
+	if (inversion_color_status == SET_ON)
 		initCommands[11]=INVERSE_COLOR;
 	else
 		initCommands[11]=NORMAL_COLOR;
@@ -146,8 +148,10 @@ void SSD1306::Init(void) {
     initialized = 1;
 
     Fill(White);
-    if (dma_status==1)
+    if (dma_status==SET_ON)
     	HAL_SPI_Transmit_DMA(SPI_Port, initCommands, 28);
+    else
+    	HAL_SPI_Transmit(SPI_Port, initCommands, 28, HAL_MAX_DELAY);
     status=0;
     SPI_Interrupt_DMA();
 }
@@ -254,13 +258,13 @@ void SSD1306::SetCursor(uint8_t x, uint8_t y) {
 SSD1306::SSD1306(I2C_HandleTypeDef* i2c, int I2C_ADDRESS){
 	this->I2C_Port=i2c;
 	this->I2C_ADDR=I2C_ADDR;
-	this->dma_status=0;
-	this->mirror_vertical_status = 0;
-	this->mirror_horizontal_status = 0;
-	this->inversion_color_status = 0;
+	this->dma_status=SET_OFF;
+	this->mirror_vertical_status = SET_OFF;
+	this->mirror_horizontal_status = SET_OFF;
+	this->inversion_color_status = SET_OFF;
 	this->height=64;
 	this->width=128;
-	i2c_or_spi=spi;
+	i2c_or_spi=I2C;
 	counter=7;
 	AllocBuffer();
 }
@@ -269,19 +273,19 @@ void SSD1306::AllocBuffer(){
 	this->SSD1306_Buffer=new uint8_t[width * height /8];
 }
 
-void SSD1306::ChangeDMA(set_status dma){
+void SSD1306::ChangeDMA(state dma){
 	dma_status=dma;
 }
 
-void SSD1306::ChangeMirrorHorizontal(set_status mirror){
+void SSD1306::ChangeMirrorHorizontal(state mirror){
 	mirror_horizontal_status = mirror;
 }
 
-void SSD1306::ChangeMirrorVertical(set_status mirror){
+void SSD1306::ChangeMirrorVertical(state mirror){
 	mirror_vertical_status = mirror;
 }
 
-void SSD1306::ChangeInversionColor(set_status inversion){
+void SSD1306::ChangeInversionColor(state inversion){
 	inversion_color_status = inversion;
 }
 
@@ -302,13 +306,13 @@ SSD1306::SSD1306(SPI_HandleTypeDef* hspi, gpio_struct reset, gpio_struct DC,
 	this->CS_Pin = CS.pin;
 	this->DC_Port = DC.port;
 	this->DC_Pin = DC.pin;
-	this->dma_status=0;
-	this->mirror_vertical_status = 0;
-	this->mirror_horizontal_status = 0;
-	this->inversion_color_status = 0;
+	this->dma_status=SET_OFF;
+	this->mirror_vertical_status = SET_OFF;
+	this->mirror_horizontal_status = SET_OFF;
+	this->inversion_color_status = SET_OFF;
 	this->height=64;
 	this->width=128;
-	i2c_or_spi=spi;
+	i2c_or_spi=SPI;
 	counter=7;
 	AllocBuffer();
 }
