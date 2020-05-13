@@ -11,8 +11,7 @@
 #ifndef __SSD1306_H__
 #define __SSD1306_H__
 
-#include <cstddef>
-#include "_ansi.h"
+
 #include "SSD1306_font.h"
 
 
@@ -35,9 +34,6 @@
  #error "SSD1306 library was tested only on STM32F1, STM32F3, STM32F4, STM32F7, STM32L0, STM32L4, STM32H7 MCU families. Please modify ssd1306.h if you know what you are doing. Also please send a pull request if it turns out the library works on other MCU's as well!"
 #endif
 
-#define SSD1306_MIRROR_VERT_OFF
-#define SSD1306_MIRROR_HORIZ_OFF
-#define SSD1306_INVERSE_COLOR_OFF
 
 #define TURN_OFF	0xAE
 #define TURN_ON 	0xAF
@@ -80,6 +76,11 @@ typedef enum {
     White = 0x01  // Pixel is set. Color depends on OLED
 } SSD1306_COLOR;
 
+typedef enum {
+	set_off = 0,
+	set_on = 1,
+} set_status;
+
 // Struct to store transformations
 
 class SSD1306 {
@@ -107,7 +108,10 @@ public:
 	void Reset(void);
 	void WriteCommand();
 	void WriteData();
-	void SwitchDMA(uint8_t dma);
+	void ChangeDMA(set_status dma);
+	void ChangeMirrorHorizontal(set_status mirror);
+	void ChangeMirrorVertical(set_status mirror);
+	void ChangeInversionColor(set_status inversion);
 	void AllocBuffer();
 
 private:
@@ -123,6 +127,9 @@ private:
 
 	uint8_t i2c_or_spi;
 	uint8_t dma_status;
+	uint8_t mirror_vertical_status;
+	uint8_t mirror_horizontal_status;
+	uint8_t inversion_color_status;
 	int height;
 	int width;
 

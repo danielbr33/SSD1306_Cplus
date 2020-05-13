@@ -87,11 +87,10 @@ void SSD1306::Init(void) {
 
     initCommands[3]=SET_PAGE_START_ADDR;
 
-	#ifdef SSD1306_MIRROR_VERT_ON
+	if (mirror_vertical_status == 1)
 		initCommands[4]=MIRROR_VERTICAL;
-	#else
+	else
 		initCommands[4]=COM_SCAN_DIRECTION;
-	#endif
 
     initCommands[5]=LOW_COLUMN_ADDR;
     initCommands[6]=HIGH_COLUMN_ADDR;
@@ -101,17 +100,15 @@ void SSD1306::Init(void) {
     initCommands[8]=SET_CONTRAST;
     initCommands[9]=CONTRAST;
 
-	#ifdef SSD1306_MIRROR_HORIZ_NO
+	if (mirror_horizontal_status == 1)
 		initCommands[10]=MIRROR_HORIZONTAL;
-	#else
+	else
 		initCommands[10]=SET_SEGMENT_REMAP;
-	#endif
 
-	#ifdef SSD1306_INVERSE_COLOR_NO
+	if (inversion_color_status == 1)
 		initCommands[11]=INVERSE_COLOR;
-	#else
+	else
 		initCommands[11]=NORMAL_COLOR;
-	#endif
 
     initCommands[12]=SET_MULTIPLEX_RATIO;
 	if (height == 32)
@@ -258,6 +255,9 @@ SSD1306::SSD1306(I2C_HandleTypeDef* i2c, int I2C_ADDRESS, int height, int width)
 	this->I2C_Port=i2c;
 	this->I2C_ADDR=I2C_ADDR;
 	this->dma_status=0;
+	this->mirror_vertical_status = 0;
+	this->mirror_horizontal_status = 0;
+	this->inversion_color_status = 0;
 	this->height=height;
 	this->width=width;
 	i2c_or_spi=1;
@@ -266,12 +266,23 @@ SSD1306::SSD1306(I2C_HandleTypeDef* i2c, int I2C_ADDRESS, int height, int width)
 }
 
 void SSD1306::AllocBuffer(){
-//	this->SSD1306_Buffer=new uint8_t[width * height /8];
-	this->SSD1306_Buffer=new uint8_t[1];
+	this->SSD1306_Buffer=new uint8_t[width * height /8];
 }
 
-void SSD1306::SwitchDMA(uint8_t dma){
+void SSD1306::ChangeDMA(set_status dma){
 	dma_status=dma;
+}
+
+void SSD1306::ChangeMirrorHorizontal(set_status mirror){
+	mirror_horizontal_status = mirror;
+}
+
+void SSD1306::ChangeMirrorVertical(set_status mirror){
+	mirror_vertical_status = mirror;
+}
+
+void SSD1306::ChangeInversionColor(set_status inversion){
+	inversion_color_status = inversion;
 }
 
 SSD1306::SSD1306(SPI_HandleTypeDef* spi, gpio_struct reset, gpio_struct DC,
@@ -284,6 +295,9 @@ SSD1306::SSD1306(SPI_HandleTypeDef* spi, gpio_struct reset, gpio_struct DC,
 	this->DC_Port = DC.port;
 	this->DC_Pin = DC.pin;
 	this->dma_status=0;
+	this->mirror_vertical_status = 0;
+	this->mirror_horizontal_status = 0;
+	this->inversion_color_status = 0;
 	this->height=height;
 	this->width=width;
 	i2c_or_spi=0;
