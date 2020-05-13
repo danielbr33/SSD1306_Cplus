@@ -112,15 +112,15 @@ int main(void)
   /* USER CODE BEGIN 2 */
   oled->ChangeDMA(SET_ON);
   oled->Init();
-  oled->Fill(White);
+  oled->Fill(WHITE);
   oled->SetCursor(0,0);
-  oled->WriteString("aaaaaaaaaaaaaaaaaa",Font_7x10,White);
+  oled->WriteString("aaaaaaaaaaaaaaaaaa",Font_7x10,WHITE);
   oled->SetCursor(0,10);
-  oled->WriteString("aaaaaaaaaaaaaaaaaa/",Font_7x10,Black);
+  oled->WriteString("aaaaaaaaaaaaaaaaaa/",Font_7x10,BLACK);
 //  oled->SetCursor(0,20);
-//  oled->WriteString("/////////////////////",Font_7x10,White);
+//  oled->WriteString("/////////////////////",Font_7x10,WHITE);
 //  oled->SetCursor(0,30);
-//  oled->WriteString("/////////////////////",Font_7x10,Black);
+//  oled->WriteString("/////////////////////",Font_7x10,BLACK);
   HAL_Delay(1000);
   /* USER CODE END 2 */
 

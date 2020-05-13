@@ -72,8 +72,8 @@
 
 // Enumeration for screen colors
 typedef enum {
-    Black = 0x00, // Black color, no pixel
-    White = 0x01  // Pixel is set. Color depends on OLED
+    BLACK, // BLACK color, no pixel
+    WHITE  // Pixel is set. Color depends on OLED
 } SSD1306_COLOR;
 
 typedef enum state {SET_OFF, SET_ON};

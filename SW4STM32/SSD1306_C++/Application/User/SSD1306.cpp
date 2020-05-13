@@ -147,7 +147,7 @@ void SSD1306::Init(void) {
     currentY = 0;
     initialized = 1;
 
-    Fill(White);
+    Fill(WHITE);
     if (dma_status==SET_ON)
     	HAL_SPI_Transmit_DMA(SPI_Port, initCommands, 28);
     else
@@ -167,7 +167,7 @@ void SSD1306::Fill(SSD1306_COLOR color) {
     uint32_t i;
 
     for(i = 0; i < width * height /8; i++) {
-        SSD1306_Buffer[i] = (color == Black) ? 0x00 : 0xFF;
+        SSD1306_Buffer[i] = (color == BLACK) ? 0x00 : 0xFF;
     }
 }
 
@@ -187,7 +187,7 @@ void SSD1306::DrawPixel(uint8_t x, uint8_t y, SSD1306_COLOR color) {
     }
 
     // Draw in the right color
-    if(color == White) {
+    if(color == WHITE) {
         SSD1306_Buffer[x + (y / 8) * width] |= 1 << (y % 8);
     } else {
         SSD1306_Buffer[x + (y / 8) * width] &= ~(1 << (y % 8));
@@ -197,7 +197,7 @@ void SSD1306::DrawPixel(uint8_t x, uint8_t y, SSD1306_COLOR color) {
 // Draw 1 char to the screen buffer
 // ch       => char om weg te schrijven
 // Font     => Font waarmee we gaan schrijven
-// color    => Black or White
+// color    => BLACK or WHITE
 char SSD1306::WriteChar(char ch, FontDef Font, SSD1306_COLOR color) {
     uint32_t i, b, j;
 
