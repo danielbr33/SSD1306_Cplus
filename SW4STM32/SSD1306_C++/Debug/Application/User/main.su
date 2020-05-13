@@ -4,6 +4,6 @@ main.cpp:281:1:void __static_initialization_and_destruction_0(int, int)	8	static
 main.cpp:60:6:void HAL_SPI_TxCpltCallback(SPI_HandleTypeDef*)	8	static
 main.cpp:143:6:void SystemClock_Config()	80	static
 main.cpp:181:6:void MX_SPI2_Init()	8	static
-main.cpp:74:5:int main()	80	static
+main.cpp:74:5:int main()	72	static
 main.cpp:275:6:void Error_Handler()	0	static
 main.cpp:281:1:cpp)	8	static

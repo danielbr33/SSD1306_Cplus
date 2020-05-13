@@ -81,6 +81,11 @@ typedef enum {
 	set_on = 1,
 } set_status;
 
+typedef enum {
+	spi=0,
+	i2c=1,
+} connection;
+
 // Struct to store transformations
 
 class SSD1306 {
@@ -91,8 +96,8 @@ public:
 		uint16_t pin;
 	};
 
-	SSD1306(I2C_HandleTypeDef* i2c, int I2C_ADDRESS, int height, int width);
-	SSD1306(SPI_HandleTypeDef* spi, gpio_struct reset, gpio_struct DC, gpio_struct CS, int height, int width);
+	SSD1306(I2C_HandleTypeDef* hi2c, int I2C_ADDRESS);
+	SSD1306(SPI_HandleTypeDef* hspi, gpio_struct reset, gpio_struct DC, gpio_struct CS);
 	virtual ~SSD1306();
 	// Procedure definitions
 	void Init(void);
@@ -112,6 +117,8 @@ public:
 	void ChangeMirrorHorizontal(set_status mirror);
 	void ChangeMirrorVertical(set_status mirror);
 	void ChangeInversionColor(set_status inversion);
+	void ChangeHeight(uint8_t height);
+	void ChangeWidth(uint8_t width);
 	void AllocBuffer();
 
 private:

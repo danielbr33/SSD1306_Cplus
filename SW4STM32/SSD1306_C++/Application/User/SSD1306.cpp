@@ -251,16 +251,16 @@ void SSD1306::SetCursor(uint8_t x, uint8_t y) {
     currentY = y;
 }
 
-SSD1306::SSD1306(I2C_HandleTypeDef* i2c, int I2C_ADDRESS, int height, int width){
+SSD1306::SSD1306(I2C_HandleTypeDef* i2c, int I2C_ADDRESS){
 	this->I2C_Port=i2c;
 	this->I2C_ADDR=I2C_ADDR;
 	this->dma_status=0;
 	this->mirror_vertical_status = 0;
 	this->mirror_horizontal_status = 0;
 	this->inversion_color_status = 0;
-	this->height=height;
-	this->width=width;
-	i2c_or_spi=1;
+	this->height=64;
+	this->width=128;
+	i2c_or_spi=spi;
 	counter=7;
 	AllocBuffer();
 }
@@ -285,9 +285,17 @@ void SSD1306::ChangeInversionColor(set_status inversion){
 	inversion_color_status = inversion;
 }
 
-SSD1306::SSD1306(SPI_HandleTypeDef* spi, gpio_struct reset, gpio_struct DC,
-			gpio_struct CS, int height, int width) {
-	this->SPI_Port = spi;
+void SSD1306::ChangeHeight(uint8_t height){
+	this->height=height;
+}
+
+void SSD1306::ChangeWidth(uint8_t width){
+	this->width=width;
+}
+
+SSD1306::SSD1306(SPI_HandleTypeDef* hspi, gpio_struct reset, gpio_struct DC,
+			gpio_struct CS) {
+	this->SPI_Port = hspi;
 	this->RESET_Port = reset.port;
 	this->RESET_Pin = reset.pin;
 	this->CS_Port = CS.port;
@@ -298,9 +306,9 @@ SSD1306::SSD1306(SPI_HandleTypeDef* spi, gpio_struct reset, gpio_struct DC,
 	this->mirror_vertical_status = 0;
 	this->mirror_horizontal_status = 0;
 	this->inversion_color_status = 0;
-	this->height=height;
-	this->width=width;
-	i2c_or_spi=0;
+	this->height=64;
+	this->width=128;
+	i2c_or_spi=spi;
 	counter=7;
 	AllocBuffer();
 }

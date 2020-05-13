@@ -86,7 +86,7 @@ int main(void)
 	gpio_cs.port = OLED_CS_GPIO_Port;
 	gpio_cs.pin = OLED_CS_Pin;
 
-	oled = new SSD1306(&hspi2, gpio_reset, gpio_dc, gpio_cs, 64, 128);
+	oled = new SSD1306(&hspi2, gpio_reset, gpio_dc, gpio_cs);
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
