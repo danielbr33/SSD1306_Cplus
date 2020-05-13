@@ -86,8 +86,8 @@ class SSD1306 {
 public:
 
 	struct gpio_struct {
-	GPIO_TypeDef* port;
-	 uint16_t pin;
+		GPIO_TypeDef* port;
+		uint16_t pin;
 	};
 
 	SSD1306(I2C_HandleTypeDef* i2c, int I2C_ADDRESS, int height, int width);
