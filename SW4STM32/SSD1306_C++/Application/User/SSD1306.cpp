@@ -9,7 +9,7 @@
 
 void SSD1306::Reset(void) {
 	// CS = High (not selected)
-	if(i2c_or_spi==0){
+	if(i2c_or_spi==spi){
 		HAL_GPIO_WritePin(CS_Port, CS_Pin, GPIO_PIN_SET);
 
 		// Reset the OLED
@@ -21,7 +21,7 @@ void SSD1306::Reset(void) {
 }
 // Send a byte to the command register
 void SSD1306::WriteCommand() {
-	if (i2c_or_spi==0){
+	if (i2c_or_spi==spi){
 		HAL_GPIO_WritePin(CS_Port, CS_Pin, GPIO_PIN_RESET); // select OLED
 		HAL_GPIO_WritePin(DC_Port, DC_Pin, GPIO_PIN_RESET); // command
 		if (dma_status==1)
@@ -38,7 +38,7 @@ void SSD1306::WriteCommand() {
 }
 // Send data
 void SSD1306::WriteData() {
-	if (i2c_or_spi==0){
+	if (i2c_or_spi==spi){
 		HAL_GPIO_WritePin(CS_Port, CS_Pin, GPIO_PIN_RESET); // select OLED
 		HAL_GPIO_WritePin(DC_Port, DC_Pin, GPIO_PIN_SET); // data
 		if (dma_status==1)
