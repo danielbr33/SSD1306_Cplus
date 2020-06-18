@@ -68,6 +68,7 @@
 #define VOLTAGE_77	0x20	//0x20,0.77xVcc
 #define SET_DC_ENABLE	0x8D
 #define DC_ENABLE	0x14
+int a;
 
 
 // Enumeration for screen colors
