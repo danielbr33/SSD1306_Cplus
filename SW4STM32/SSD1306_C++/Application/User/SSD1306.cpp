@@ -59,9 +59,9 @@ void SSD1306::SPI_Interrupt_DMA(){
 	//if (dma_status == 1){
 		if (status==2);
 		else if (status==0){
-			lineCommands[0]=0xB0 + counter;
-			lineCommands[1]=0x00;
-			lineCommands[2]=0x10;
+			lineCommands[0]=SET_PAGE_START_ADDR + counter;
+			lineCommands[1]=LOW_COLUMN_ADDR;
+			lineCommands[2]=HIGH_COLUMN_ADDR;
 			status=1;
 			WriteCommand();
 		}
